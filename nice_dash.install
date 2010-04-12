@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function nice_dash_install() {
+  drupal_install_schema('nice_dash');
+  drupal_set_message(t('Nice dash is succesfully installed, you can change <a href="@settings-page">the dashboard settings here</a>.',array('@settings-page' => url("admin/dashboard/settings"))));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function nice_dash_uninstall() {
+  drupal_uninstall_schema('nice_dash');
+  drupal_set_message(t('Nice dash is succesfully uninstalled.'));
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function nice_dash_schema() {
+
+  $schema['nice_dash_widget_values'] = array(
+    'fields' => array(
+      'wid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'widget_key' => array(
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'region' => array(
+        'type' => 'varchar',
+        'length' => '15',
+        'not null' => TRUE,
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('wid', 'widget_key'),
+  );
+
+  return $schema;
+}

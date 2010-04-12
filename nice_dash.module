@@ -74,11 +74,12 @@ function nice_dash_theme($existing, $type, $theme, $path){
 			'file' => 'nice_dash.theme.inc',
     ),
 		'nice_dash_page' => array(
-			'arguments' => array('left' => NULL, 'right' => NULL),
+			'arguments' => array('regions' => NULL),
 			'file' => 'nice_dash.theme.inc',
 		),
 		 'nice_dash_settings_form' => array(
       'arguments' => array('form' => NULL),
+      'template' => 'nice-dash-dashboard-settings-form',
 			'file' => 'nice_dash.theme.inc',
     ),
 	);
@@ -117,4 +118,42 @@ function nice_dash_block($op = 'list', $delta = 0, $edit = array()) {
       }
       return $block;
   }
+}
+
+/**
+ * Dashboard regions
+ *
+ * @return: An array of layout regions available for widgets
+ */
+function nice_dash_regions() {
+  return array(
+		'header' => t('Header'),
+		'left' => t('Left'),
+		'right' => t('Right'),
+		'footer' => t('Footer'),
+		'disabled' => t('Disabled')
+  );
+}
+
+/**
+ * Fetch widget values
+ */
+function nice_dash_widget_values($key){
+ //
+ $result = db_query("SELECT region, weight FROM {nice_dash_widget_values} WHERE widget_key = '%s'", $key);
+ while($row = db_fetch_array($result)){
+   return $row;
+ }
+ // If empty
+ return nice_dash_widget_default_values();
+}
+
+/**
+ * Default widget values
+ */
+function nice_dash_widget_default_values(){
+ return array(
+   'weight' => 0,
+   'region' => 'disabled'
+ );
 }

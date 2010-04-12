@@ -15,36 +15,69 @@ function theme_nice_dash_component($title, $description, $content){
 /**
  * Theme callback for the dashboard page
  */
-function theme_nice_dash_page($left, $right){
+function theme_nice_dash_page($regions){
+
 	$output = '<div class="admin clear-block">';
-	$output .= '<div class="left clear-block">'. $left .'</div>';
-	$output .= '<div class="right clear-block">'. $right .'</div>';
+	$output .= '<div class="clear-block">'.$regions['header'].'</div>';
+	$output .= '<div class="left clear-block">'. $regions['left'] .'</div>';
+	$output .= '<div class="right clear-block">'. $regions['right'] .'</div>';
+	$output .= '<div class="clear-block">'.$regions['footer'].'</div>';
 	$output .= '</div>';
   return $output;
 }
 
 
 /**
-* Theme the re-ordering form
-*/
-function theme_nice_dash_settings_form(&$vars) {
+ * Preprocess function from the dashboard setting form
+ *
+ * Here the regions are added
+ */
+function template_preprocess_nice_dash_settings_form(&$vars) {
+  $form = &$vars['form'];
+
+  // Order the widgets
+  $order = array();
+  foreach ($form['#widgets'] as $key => $field) {
+    $order[$field] = $form[$field]['weight']['#default_value'];
+  }
+  asort($order);
+
+	$rows = array();
+  foreach ($order as $key => $field) {
+    $element = &$form[$key];
+    $row = new stdClass();
+
+    // Each field will have a region, store it temporarily
+    $region = $element['region']['#default_value'];
+
+    foreach (element_children($element) as $child) {
+			if ($child == 'weight') {
+        $element['weight']['#attributes']['class'] = 'field-weight field-weight-'. $region;
+        $element['weight'] = process_weight($element['weight']);
+      }
+			$row->{$child} = drupal_render($element[$child]);
+    }
+
+    // Add draggable.
+    $row->class = 'draggable';
+    if ($region == 'disabled') {
+      $row->class .= ' region-css-'. $region;
+    }
+    $rows[$region][] = $row;
+  }
 
   drupal_add_js('misc/tableheader.js');
+  drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/nice_dash.js');
+  drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
 
-  drupal_add_tabledrag('draggabledemo-sort', 'order', 'sibling', 'sort');
-  $header = array('', 'title', 'sort');
-  foreach (element_children($form) as $key) {
-    // Add class to group weight fields for drag and drop.
-    $form[$key]['sort']['#attributes']['class'] = 'sort';
+	$regions = nice_dash_regions();
 
-    $row = array(''); //This is important. We need to start with an empty element for the drag handle.
-
-    $row[] = drupal_render($form[$key]['title']);
-    $row[] = drupal_render($form[$key]['sort']);
-    $rows[] = array('data' => $row, 'class' => 'draggable'); //note the difference between $row and $rows
+	foreach ($regions as $region => $title) {
+    drupal_add_tabledrag('fields', 'match', 'sibling', 'field-region-select', 'field-region-'. $region, NULL, FALSE);
+    drupal_add_tabledrag('fields', 'order', 'sibling', 'field-weight', 'field-weight-'. $region);
   }
-  $output = theme('table', $header, $rows, array('id' => 'draggabledemo-sort'));
-  $vars['regions'] = $regions;
-  $output .= drupal_render($form);
-  return $output;
+
+  $vars['rows'] = $rows;
+  $vars['submit'] = drupal_render($form);
+	$vars['regions'] = $regions;
 }
