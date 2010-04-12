@@ -68,19 +68,24 @@ function nice_dash_perm() {
  * Implementation of hook_theme()
  */
 function nice_dash_theme($existing, $type, $theme, $path){
+  $path = drupal_get_path('module', 'nice_dash');
+
 	return array(
     'nice_dash_component' => array(
       'arguments' => array('title' => NULL, 'description' => NULL, 'content' => NULL),
-			'file' => 'nice_dash.theme.inc',
+      'file' => 'theme.inc',
+      'path' => $path .'/theme',
     ),
 		'nice_dash_page' => array(
 			'arguments' => array('regions' => NULL),
-			'file' => 'nice_dash.theme.inc',
+      'file' => 'theme.inc',
+      'path' => $path .'/theme',
 		),
 		 'nice_dash_settings_form' => array(
       'arguments' => array('form' => NULL),
       'template' => 'nice-dash-dashboard-settings-form',
-			'file' => 'nice_dash.theme.inc',
+      'file' => 'theme.inc',
+      'path' => $path .'/theme',
     ),
 	);
 }

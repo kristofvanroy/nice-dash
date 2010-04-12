@@ -2,3 +2,7 @@
 #fields tr.region-populated {
   display: none;
 }
+
+#nice-dashboard .left {float:left; width:49%;}
+#nice-dashboard .right {float:right; width:49%;}
+#nice-dashboard .clear {clear:both;}
