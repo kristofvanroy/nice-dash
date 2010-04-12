@@ -1,5 +1,0 @@
-name = Nice Dash Content Plugin
-description = Content widgets for nice dash
-package = Nice dashboard
-dependencies[] = nice_dash
-core = 6.x
