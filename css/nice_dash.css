@@ -1,8 +1,10 @@
+/* Drag and drop support for the settings page */
+#fields tr.region-populated {display: none;}
 
-#fields tr.region-populated {
-  display: none;
-}
-
+/* Dashboard column layout */
 #nice-dashboard .left {float:left; width:49%;}
 #nice-dashboard .right {float:right; width:49%;}
 #nice-dashboard .clear {clear:both;}
+
+/* Dashboard component layout */
+.dashboard-component .content {padding: 10px;}

@@ -73,11 +73,13 @@ function nice_dash_theme($existing, $type, $theme, $path){
 	return array(
     'nice_dash_component' => array(
       'arguments' => array('title' => NULL, 'description' => NULL, 'content' => NULL),
+			'template' => 'nice-dash-dashboard-component',
       'file' => 'theme.inc',
       'path' => $path .'/theme',
     ),
 		'nice_dash_page' => array(
 			'arguments' => array('regions' => NULL),
+			'template' => 'nice-dash-dashboard',
       'file' => 'theme.inc',
       'path' => $path .'/theme',
 		),
