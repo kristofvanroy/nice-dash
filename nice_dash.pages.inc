@@ -9,9 +9,12 @@ function nice_dash_dashboard_page() {
 	$widgets = module_invoke_all('nice_dash_widgets');
 
 	if($widgets){
-		foreach($widgets as $key => $value){
-			$widget_values = nice_dash_widget_values($key);
-			$regions[$widget_values['region']] .= call_user_func($value['callback']);
+
+		// Order them in the query
+		$result = db_query("SELECT * FROM {nice_dash_widget_values} ORDER BY weight");
+
+		while($row = db_fetch_array($result)){
+			$regions[$row['region']] .= call_user_func($widgets[$row['widget_key']]['callback']);
 		}
 	}
 
@@ -70,6 +73,7 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
 	if (sizeof($values['widgets']) > 0) {
 		foreach($values['widgets'] as $key){
 			$widget = new stdClass();
+			$update_keys = array();
 
 			// Check if row exists
 			$wid = db_result(db_query("SELECT wid FROM {nice_dash_widget_values} WHERE widget_key = '%s'", $key));
