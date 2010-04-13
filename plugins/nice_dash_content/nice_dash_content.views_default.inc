@@ -266,13 +266,7 @@ function nice_dash_content_views_default_views() {
     ),
     'type' => array(
       'operator' => 'in',
-      'value' => array(
-        'episode' => 'episode',
-        'htmlblock' => 'htmlblock',
-        'imageblock' => 'imageblock',
-        'page' => 'page',
-        'program' => 'program',
-      ),
+      'value' => array(),
       'group' => '0',
       'exposed' => TRUE,
       'expose' => array(
@@ -289,12 +283,41 @@ function nice_dash_content_views_default_views() {
       'table' => 'node',
       'field' => 'type',
       'override' => array(
-        'button' => 'Overschrijf',
+        'button' => 'Use default',
       ),
       'relationship' => 'none',
     ),
   ));
   $handler->override_option('title', 'Latest content');
+  $handler->override_option('style_options', array(
+    'grouping' => '',
+    'override' => 1,
+    'sticky' => 0,
+    'order' => 'asc',
+    'columns' => array(
+      'title' => 'title',
+      'status' => 'status',
+      'language' => 'language',
+      'edit_node' => 'edit_node',
+    ),
+    'info' => array(
+      'title' => array(
+        'sortable' => 1,
+        'separator' => ' ',
+      ),
+      'status' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'language' => array(
+        'separator' => '',
+      ),
+      'edit_node' => array(
+        'separator' => ' ',
+      ),
+    ),
+    'default' => '-1',
+  ));
   $handler->override_option('block_description', '');
   $handler->override_option('block_caching', -1);
   $handler = $view->new_display('block', 'Sticky content', 'block_2');
@@ -456,6 +479,35 @@ function nice_dash_content_views_default_views() {
     ),
   ));
   $handler->override_option('items_per_page', 10);
+  $handler->override_option('style_options', array(
+    'grouping' => '',
+    'override' => 1,
+    'sticky' => 0,
+    'order' => 'asc',
+    'columns' => array(
+      'title' => 'title',
+      'status' => 'status',
+      'language' => 'language',
+      'edit_node' => 'edit_node',
+    ),
+    'info' => array(
+      'title' => array(
+        'sortable' => 1,
+        'separator' => ' ',
+      ),
+      'status' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'language' => array(
+        'separator' => '',
+      ),
+      'edit_node' => array(
+        'separator' => ' ',
+      ),
+    ),
+    'default' => '-1',
+  ));
   $handler->override_option('block_description', '');
   $handler->override_option('block_caching', -1);
   $handler = $view->new_display('block', 'Frontpage content', 'block_3');
@@ -618,9 +670,39 @@ function nice_dash_content_views_default_views() {
   ));
   $handler->override_option('title', 'Frontpage content');
   $handler->override_option('items_per_page', 10);
+  $handler->override_option('style_options', array(
+    'grouping' => '',
+    'override' => 1,
+    'sticky' => 0,
+    'order' => 'asc',
+    'columns' => array(
+      'title' => 'title',
+      'status' => 'status',
+      'language' => 'language',
+      'edit_node' => 'edit_node',
+    ),
+    'info' => array(
+      'title' => array(
+        'sortable' => 1,
+        'separator' => ' ',
+      ),
+      'status' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'language' => array(
+        'separator' => '',
+      ),
+      'edit_node' => array(
+        'separator' => ' ',
+      ),
+    ),
+    'default' => '-1',
+  ));
   $handler->override_option('block_description', '');
   $handler->override_option('block_caching', -1);
-  
+
+
   $views[$view->name] = $view;
   return $views;
 }

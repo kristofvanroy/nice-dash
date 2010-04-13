@@ -2,6 +2,7 @@
 #fields tr.region-populated {display: none;}
 
 /* Dashboard column layout */
+#nice-dashboard .admin-panel {margin: 0 0 35px;}
 #nice-dashboard .left {float:left; width:49%;}
 #nice-dashboard .right {float:right; width:49%;}
 #nice-dashboard .clear {clear:both;}

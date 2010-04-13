@@ -6,7 +6,7 @@
 function nice_dash_comments_views_api() {
   return array(
     'api' => 2,
-    'path' => drupal_get_path('module', 'nice_dash_comment'),
+    'path' => drupal_get_path('module', 'nice_dash_comments'),
   );
 }
 

@@ -22,5 +22,11 @@ function nice_dash_user_nice_dash_widgets(){
 		//'file' => 'nice_dash_content.widgets.inc'
 	);
 
+	$widgets['user_last_login'] = array(
+		'title' => t('Latest loggedin users'),
+		'callback' => 'nice_dash_user_widget_last_login',
+		//'file' => 'nice_dash_content.widgets.inc'
+	);
+
 	return $widgets;
 }
