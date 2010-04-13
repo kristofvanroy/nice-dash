@@ -6,5 +6,10 @@
 #nice-dashboard .right {float:right; width:49%;}
 #nice-dashboard .clear {clear:both;}
 
+/* Dashboard filter layout */
+.filter-container {float:right; text-align:right;}
+.filter-container .toggle-link {display:inline-block; padding: 0px 5px 5px 25px; background: url('../images/page_find.png') no-repeat 0 3px; }
+.filter-container .clear{clear:both;}
+
 /* Dashboard component layout */
 .dashboard-component .content {padding: 10px;}

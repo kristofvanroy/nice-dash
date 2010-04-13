@@ -5,6 +5,7 @@
  * Theme callback for the dashboard page
  */
 function template_preprocess_nice_dash_page(&$vars){
+	drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/dashboard.js');
   drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
 }
 
@@ -50,7 +51,7 @@ function template_preprocess_nice_dash_settings_form(&$vars) {
 		}
 
 		drupal_add_js('misc/tableheader.js');
-		drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/nice_dash.js');
+		drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/widgets.js');
 		drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
 
 		$regions = nice_dash_regions();

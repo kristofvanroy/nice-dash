@@ -18,6 +18,7 @@ function nice_dash_comments_nice_dash_widgets(){
 
 
 	$widgets['latest_comments'] = array(
+		'title' => t('Latest comments'),
 		'callback' => 'nice_dash_comments_widget_latest_comments',
 		//'file' => 'nice_dash_content.widgets.inc'
 	);
