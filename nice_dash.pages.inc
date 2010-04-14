@@ -4,7 +4,6 @@
  * Menu callback for the dashboard page.
  */
 function nice_dash_dashboard_page() {
-	$output = '';
 
 	$widgets = module_invoke_all('nice_dash_widgets');
 
@@ -14,8 +13,15 @@ function nice_dash_dashboard_page() {
 		$result = db_query("SELECT * FROM {nice_dash_widget_values} ORDER BY weight");
 
 		while($row = db_fetch_array($result)){
-			$regions[$row['region']] .= call_user_func($widgets[$row['widget_key']]['callback']);
+			if($row['region'] != 'disabled'){
+				$regions[$row['region']] .= call_user_func($widgets[$row['widget_key']]['callback']);
+			}
 		}
+	}
+
+	if(!count($regions)){
+		drupal_set_message(t('You have not configured any widgets yet. Goto the <a href="@settings-page">dashboard settings</a> and configure some widgets first.',array('@settings-page' => url("admin/dashboard/settings"))),'warning');
+		return '';
 	}
 
 	return theme('nice_dash_page', $regions);
@@ -23,7 +29,7 @@ function nice_dash_dashboard_page() {
 }
 
 /**
- * Menu callback for the dashboard page.
+ * Menu callback for the dashboard settings page.
  */
 function nice_dash_dashboard_settings_form() {
 
@@ -53,13 +59,17 @@ function nice_dash_dashboard_settings_form() {
 			);
 			$form[$key]['weight'] = array('#type' => 'weight', '#delta' => 1, '#default_value' => $default_values['weight']);
 		}
+
+		$form['widgets'] = array('#type' => 'value', '#value' => $form['#widgets']);
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Save'),
+		);
+	}
+	else {
+		drupal_set_message(t('You have to enable at least one of the Nice Dashboard plugin modules. Goto the <a href="@modules-page">modules page</a> and enable one or more of the Nice Dashboard plugins.',array('@modules-page' => url("admin/build/modules"))),'warning');
 	}
 
-	$form['widgets'] = array('#type' => 'value', '#value' => $form['#widgets']);
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
 
 	return $form;
 
