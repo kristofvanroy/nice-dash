@@ -1,6 +1,7 @@
-// $Id: ds.js,v 1.1.2.7 2010/01/29 14:22:40 swentel Exp $
-
 /**
+ * DEVELOPMENT NOTE:
+ * This javascript has it's origin from the Display Suite by Swentel
+ * ---------------------------------------------------------------------------- 
  * Move a field in the fields table from one region to another via select list.
  *
  * This behavior is dependent on the tableDrag behavior, since it uses the
@@ -55,14 +56,6 @@ Drupal.behaviors.fieldDrag = function(context) {
       var row = $(this).parents('tr:first');
       var select = $(this);
       tableDrag.rowObject = new tableDrag.row(row);
-
-      // Manage classes to make it look disabled
-      if(select[0].value == 'disabled') {
-        $(row).addClass('region-css-disabled');
-      }
-      else {
-        $(row).removeClass('region-css-disabled');
-      }
 
       // Find the correct region and insert the row as the first in the region.
       $('tr.region-message', table).each(function() {
