@@ -39,7 +39,7 @@ function nice_dash_menu() {
     'file' => 'nice_dash.pages.inc'
   );
 
-	$items['admin/dashboard/configure/create-dashboard'] = array(
+	$items['admin/dashboard/configure/create'] = array(
 		'title' => 'Create new dashboard',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('nice_dash_dashboard_settings_form'),
@@ -47,6 +47,16 @@ function nice_dash_menu() {
 		'type' => MENU_LOCAL_TASK,
 		'file' => 'nice_dash.pages.inc'
 	);
+
+	 $items['admin/dashboard/configure/delete/%'] = array(
+		'title' => 'Create new dashboard',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_dashboard_delete_form',4),
+		'access arguments' => array('administer nice dashboard'),
+		'type' => MENU_CALLBACK,
+		'file' => 'nice_dash.pages.inc'
+	);
+
 
  // Implement all the dashboard menu calls
  $dashboards = nice_dash_dashboards();
@@ -242,4 +252,14 @@ function nice_dash_dashboards(){
 	}
 
 	return $rows;
+}
+
+/**
+ * Delete dashboard
+ */
+function nice_dash_remove_dashboard($did){
+	db_query("DELETE FROM {nice_dash_dashboards} WHERE did = %d", $did);
+	db_query("DELETE FROM {nice_dash_widgets} WHERE did = %d", $did);
+	// Clear them from the menu
+	module_invoke('menu','rebuild');
 }

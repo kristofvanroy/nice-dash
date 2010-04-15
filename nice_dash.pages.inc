@@ -33,17 +33,24 @@ function nice_dash_dashboard_page($did = NULL) {
 }
 
 function nice_dash_dashboard_overview_page(){
-	$result = db_query("SELECT did, name FROM nice_dash_dashboards ORDER BY weight ASC");
-	$headers = array(t('Name'), t('Actions'));
-	$rows = array();
 
-	while($row = db_fetch_array($result)){
-		$rows[] = array(
-			l($row['name'], 'admin/dashboard'),
-			l(t('Edit'), 'admin/dashboard/configure/'.$row['did'].'/edit').' | '.t('Delete'));
+	$dashboards = nice_dash_dashboards();
+
+	if(count($dashboards) > 0){
+		$headers = array(t('Name'), t('Actions'));
+		$rows = array();
+		foreach($dashboards as $dashboard){
+			$rows[] = array(
+				l($dashboard['name'], 'admin/dashboard'),
+				l(t('Edit'), 'admin/dashboard/configure/'.$dashboard['did'].'/edit').' | '.l(t('Delete'), 'admin/dashboard/configure/delete/'.$dashboard['did']));
+
+		}
+		return theme('table', $headers, $rows);
 	}
-
-	return theme('table', $headers, $rows);
+	else {
+		drupal_set_message(t('You have to create a dashboard first. You can create your first dashboard on the <a href="@create-page">dashboard create page</a>.',array('@create-page' => url("admin/dashboard/configure/create"))), 'warning');
+		return '';
+	}
 }
 
 
@@ -157,4 +164,35 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
   }
 
 	module_invoke('menu','rebuild');
+}
+
+/**
+ * Confirm delete form for dashboards
+ */
+function nice_dash_dashboard_delete_form($form_state, $did) {
+  $form = array();
+  $form['did'] = array('#value' => $did, '#type' => 'value');
+	$dashboard = nice_dash_dashboard_values($did);
+
+	if(empty($dashboard)){
+		drupal_set_message(t('The dashboard you want to delete does not exist. Go back to the <a href="@overview-page">dashboard overview page</a>.', array('@overview-page' => url("admin/dashboard/configure"))),'warning');
+		return $form;
+	}
+
+  return confirm_form(
+    $form,
+    t('Are your sure you want to delete the dashboard %name', array('%name' => $dashboard['name'])),
+    'admin/dashboard/configure',
+    t('This action cannot be undone.'),
+    t('Delete')
+	);
+}
+
+/**
+ * Submit for confirm delete form for dashboards
+ */
+function nice_dash_dashboard_delete_form_submit($form, &$form_state) {
+	nice_dash_remove_dashboard($form_state['values']['did']);
+  drupal_set_message(t('The dashboard has been removed'));
+  drupal_goto('admin/dashboard/configure');
 }

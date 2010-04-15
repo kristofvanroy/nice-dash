@@ -14,7 +14,7 @@ function nice_dash_dashboard_block(){
     }
   }
 
-  $links['create']['href'] = 'admin/dashboard/create-dashboard';
+  $links['create']['href'] = 'admin/dashboard/create';
   $links['create']['title'] = t('Create new dashboard');
 
   $links['configure']['href'] = 'admin/dashboard/configure';
