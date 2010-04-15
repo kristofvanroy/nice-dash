@@ -7,30 +7,85 @@ function nice_dash_menu() {
 
  $items['admin/dashboard'] = array(
     'title' => 'Dashboard',
-		'page callback' => 'nice_dash_dashboard_page',
-		'access arguments' => array('view nice dashboard'),
-		'type' => MENU_NORMAL_ITEM,
-		'file' => 'nice_dash.pages.inc'
+    'page callback' => 'nice_dash_dashboard_page',
+    'access arguments' => array('view nice dashboard'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'nice_dash.pages.inc'
   );
 
  $items['admin/dashboard/view'] = array(
     'title' => 'View',
-		'page callback' => 'nice_dash_dashboard_page',
-		'access arguments' => array('view nice dashboard'),
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-		'weight' => -1,
-		'file' => 'nice_dash.pages.inc'
+    'page callback' => 'nice_dash_dashboard_page',
+    'access arguments' => array('view nice dashboard'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+    'file' => 'nice_dash.pages.inc'
   );
 
-  $items['admin/dashboard/settings'] = array(
-    'title' => 'Settings',
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('nice_dash_dashboard_settings_form'),
+
+
+  $items['admin/dashboard/configure'] = array(
+    'title' => 'Configure',
+    'page callback' => 'nice_dash_dashboard_overview_page',
+    'access arguments' => array('administer nice dashboard'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'nice_dash.pages.inc'
+  );
+
+	$items['admin/dashboard/configure/overview'] = array(
+    'title' => 'Overview',
+    'page callback' => 'nice_dash_dashboard_overview_page',
+    'access arguments' => array('administer nice dashboard'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+		'weight' => -1,
+    'file' => 'nice_dash.pages.inc'
+  );
+
+	$items['admin/dashboard/configure/create-dashboard'] = array(
+		'title' => 'Create new dashboard',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_dashboard_settings_form'),
 		'access arguments' => array('administer nice dashboard'),
 		'type' => MENU_LOCAL_TASK,
 		'file' => 'nice_dash.pages.inc'
-  );
+	);
 
+ // Implement all the dashboard menu calls
+ $dashboards = nice_dash_dashboards();
+
+	if(count($dashboards) > 0){
+
+	 $first = TRUE;
+
+	 foreach($dashboards as $dashboard){
+		 $items['admin/dashboard/configure/'.$dashboard['did'].'/edit'] = array(
+		 'title' => 'Edit '.$dashboard['name'],
+		 'page callback' => 'drupal_get_form',
+		 'page arguments' => array('nice_dash_dashboard_settings_form',3),
+		 'access arguments' => array('administer nice dashboard'),
+		 'type' => MENU_LOCAL_TASK,
+		 'file' => 'nice_dash.pages.inc'
+		);
+
+		if($first){
+		 $type = MENU_DEFAULT_LOCAL_TASK;
+		 $first = FALSE;
+		}
+		else {
+		 $type = MENU_LOCAL_TASK;
+		}
+
+		$items['admin/dashboard/view/'.$dashboard['did']] = array(
+		 'title' => $dashboard['name'],
+		 'page callback' => 'nice_dash_dashboard_page',
+		 'page arguments' => array(3),
+		 'access arguments' => array('view nice dashboard'),
+		 'type' => $type,
+		 'weight' => $dashboard['weight'],
+		 'file' => 'nice_dash.pages.inc'
+		);
+	 }
+	}
   return $items;
 }
 
@@ -50,10 +105,10 @@ function nice_dash_init() {
 function nice_dash_user($op, &$edit, &$account, $category = NULL){
   switch ($op) {
     case 'login':
-	  if (user_access('view admindashboard')) {
-	  	$_SESSION['admin_dashboard_redirect'] = true;
-	  }
-	  break;
+    if (user_access('view admindashboard')) {
+      $_SESSION['admin_dashboard_redirect'] = true;
+    }
+    break;
   }
 }
 
@@ -70,26 +125,26 @@ function nice_dash_perm() {
 function nice_dash_theme($existing, $type, $theme, $path){
   $path = drupal_get_path('module', 'nice_dash');
 
-	return array(
+  return array(
     'nice_dash_component' => array(
       'arguments' => array('title' => NULL, 'description' => NULL, 'content' => NULL),
-			'template' => 'nice-dash-dashboard-component',
+      'template' => 'nice-dash-dashboard-component',
       'file' => 'theme.inc',
       'path' => $path .'/theme',
     ),
-		'nice_dash_page' => array(
-			'arguments' => array('regions' => NULL),
-			'template' => 'nice-dash-dashboard',
+    'nice_dash_page' => array(
+      'arguments' => array('regions' => NULL),
+      'template' => 'nice-dash-dashboard',
       'file' => 'theme.inc',
       'path' => $path .'/theme',
-		),
-		 'nice_dash_settings_form' => array(
+    ),
+     'nice_dash_settings_form' => array(
       'arguments' => array('form' => NULL),
       'template' => 'nice-dash-dashboard-settings-form',
       'file' => 'theme.inc',
       'path' => $path .'/theme',
     ),
-	);
+  );
 }
 
 /**
@@ -112,11 +167,11 @@ function nice_dash_block($op = 'list', $delta = 0, $edit = array()) {
         'info' => t('Dashboard'),
         'admin' => TRUE,
         'cache' => FALSE,
-				'weight' => -1,
+        'weight' => -1,
       );
       return $blocks;
     case 'view': default:
-			module_load_include('inc', 'nice_dash', 'nice_dash.blocks');
+      module_load_include('inc', 'nice_dash', 'nice_dash.blocks');
       switch ($delta) {
         case 'dashboard':
           $block['subject'] = t('Dashboard');
@@ -134,20 +189,20 @@ function nice_dash_block($op = 'list', $delta = 0, $edit = array()) {
  */
 function nice_dash_regions() {
   return array(
-		'header' => t('Header'),
-		'left' => t('Left'),
-		'right' => t('Right'),
-		'footer' => t('Footer'),
-		'disabled' => t('Disabled')
+    'header' => t('Header'),
+    'left' => t('Left'),
+    'right' => t('Right'),
+    'footer' => t('Footer'),
+    'disabled' => t('Disabled')
   );
 }
 
 /**
  * Fetch widget values
  */
-function nice_dash_widget_values($key){
+function nice_dash_widget_values($key, $did){
  //
- $result = db_query("SELECT region, weight FROM {nice_dash_widget_values} WHERE widget_key = '%s'", $key);
+ $result = db_query("SELECT region, weight FROM {nice_dash_widgets} WHERE widget_key = '%s' AND did = %d", $key, $did);
  while($row = db_fetch_array($result)){
    return $row;
  }
@@ -163,4 +218,30 @@ function nice_dash_widget_default_values(){
    'weight' => 0,
    'region' => 'disabled'
  );
+}
+
+/**
+ * Fetch dashboards
+ */
+function nice_dash_dashboard_values($did){
+	$result = db_query("SELECT * FROM {nice_dash_dashboards} WHERE did = %d", $did);
+	$rows = array();
+
+	while ($row = db_fetch_array($result)){
+		return $row;
+	}
+}
+
+/**
+ * Fetch dashboards
+ */
+function nice_dash_dashboards(){
+	$result = db_query("SELECT * FROM {nice_dash_dashboards} ORDER BY weight ASC");
+	$rows = array();
+
+	while ($row = db_fetch_array($result)){
+	 $rows[] = $row;
+	}
+
+	return $rows;
 }

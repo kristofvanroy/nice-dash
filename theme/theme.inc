@@ -18,6 +18,9 @@ function template_preprocess_nice_dash_page(&$vars){
 function template_preprocess_nice_dash_settings_form(&$vars) {
   $form = &$vars['form'];
 
+	$vars['above_widget_settings'] = drupal_render($form['dashboard_name']);
+	$vars['below_widget_settings'] = '';
+
   // Order the widgets
   $order = array();
 	if(sizeof($form['#widgets'])){

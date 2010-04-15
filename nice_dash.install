@@ -21,7 +21,27 @@ function nice_dash_uninstall() {
  */
 function nice_dash_schema() {
 
-  $schema['nice_dash_widget_values'] = array(
+  $schema['nice_dash_dashboards'] = array(
+    'fields' => array(
+      'did' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('did'),
+  );
+
+  $schema['nice_dash_widgets'] = array(
     'fields' => array(
       'wid' => array(
         'type' => 'serial',
@@ -30,6 +50,10 @@ function nice_dash_schema() {
       'widget_key' => array(
         'type' => 'varchar',
         'length' => '128',
+        'not null' => TRUE,
+      ),
+      'did' => array(
+        'type' => 'int',
         'not null' => TRUE,
       ),
       'region' => array(
@@ -42,7 +66,7 @@ function nice_dash_schema() {
         'not null' => TRUE,
       ),
     ),
-    'primary key' => array('wid', 'widget_key'),
+    'primary key' => array('wid', 'widget_key', 'did'),
   );
 
   return $schema;

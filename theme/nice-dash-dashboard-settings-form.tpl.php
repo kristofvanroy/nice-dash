@@ -1,4 +1,6 @@
 <?php
+print $above_widget_settings;
+
 if ($rows): ?>
 <div id="field-content">
   <table id="fields" class="sticky-enabled">
@@ -40,5 +42,7 @@ if ($rows): ?>
   </table>
 </div>
 <?php
+print $below_widget_settings;
+
 print $submit;
 endif;
