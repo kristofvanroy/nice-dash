@@ -155,4 +155,6 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
       drupal_write_record('nice_dash_widgets', $widget, $update_keys);
     }
   }
+
+	module_invoke('menu','rebuild');
 }

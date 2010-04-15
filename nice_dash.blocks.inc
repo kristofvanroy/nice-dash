@@ -5,8 +5,18 @@
  */
 function nice_dash_dashboard_block(){
 
-  $output['goto']['href'] = 'admin/dashboard';
-  $output['goto']['title'] = t('Open dashboard');
+  $dashboards = nice_dash_dashboards();
 
-  return theme('links', $output, array('class' => 'menu drilldown-active-menu'));
+  $links['default']['href'] = 'admin/dashboard';
+  $links['default']['title'] = t('Open dashboard');
+
+
+	if(count($dashboards) > 0){
+    foreach($dashboards as $dashboard){
+      $links['dash-'.$dashboard['did']]['href'] = 'admin/dashboard/view/'.$dashboard['did'];
+      $links['dash-'.$dashboard['did']]['title'] = $dashboard['name'];
+    }
+  }
+
+  return theme('links', $links, array('class' => 'menu drilldown-active-menu'));
 }
