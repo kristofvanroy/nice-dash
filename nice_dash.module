@@ -22,8 +22,6 @@ function nice_dash_menu() {
     'file' => 'nice_dash.pages.inc'
   );
 
-
-
   $items['admin/dashboard/configure'] = array(
     'title' => 'Configure',
     'page callback' => 'nice_dash_dashboard_overview_page',

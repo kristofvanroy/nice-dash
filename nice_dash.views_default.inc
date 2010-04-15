@@ -322,13 +322,7 @@ function nice_dash_views_default_views() {
     ),
     'type' => array(
       'operator' => 'in',
-      'value' => array(
-        'episode' => 'episode',
-        'htmlblock' => 'htmlblock',
-        'imageblock' => 'imageblock',
-        'page' => 'page',
-        'program' => 'program',
-      ),
+      'value' => array(),
       'group' => '0',
       'exposed' => TRUE,
       'expose' => array(
@@ -345,7 +339,7 @@ function nice_dash_views_default_views() {
       'table' => 'node',
       'field' => 'type',
       'override' => array(
-        'button' => 'Overschrijf',
+        'button' => 'Override',
       ),
       'relationship' => 'none',
     ),
@@ -411,7 +405,8 @@ function nice_dash_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
-    'type' => 'none',
+    'type' => 'perm',
+    'perm' => 'administer nodes',
   ));
   $handler->override_option('cache', array(
     'type' => 'none',
