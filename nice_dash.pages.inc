@@ -48,7 +48,7 @@ function nice_dash_dashboard_overview_page(){
 		return theme('table', $headers, $rows);
 	}
 	else {
-		drupal_set_message(t('You have to create a dashboard first. You can create your first dashboard on the <a href="@create-page">dashboard create page</a>.',array('@create-page' => url("admin/dashboard/configure/create"))), 'warning');
+		drupal_set_message(t('You have to create a dashboard first. You can create your first dashboard on the <a href="@create-page">dashboard create page</a>.',array('@create-page' => url("admin/dashboard/configure/create-dashboard"))), 'warning');
 		return '';
 	}
 }
@@ -195,4 +195,70 @@ function nice_dash_dashboard_delete_form_submit($form, &$form_state) {
 	nice_dash_remove_dashboard($form_state['values']['did']);
   drupal_set_message(t('The dashboard has been removed'));
   drupal_goto('admin/dashboard/configure');
+}
+
+function nice_dash_widget_settings_form(){
+
+	$form['title'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Widget title'),
+		'#size' => 60,
+		'#required' => TRUE,
+	);
+
+	$form['description'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Description'),
+		'#size' => 60,
+		'#required' => TRUE,
+	);
+
+	$block_info = array();
+  foreach (module_implements('block') as $module) {
+    $module_blocks = module_invoke($module, 'block', 'list');
+    if ($module_blocks) {
+      foreach ($module_blocks as $delta => $info) {
+        $block_info["{$module}-{$delta}"] = $info;
+      }
+    }
+  }
+
+  // Get default block options.
+  $options = array();
+  $enabled = array_filter(admin_get_settings('blocks')) + admin_get_default_blocks(TRUE);
+  foreach ($block_info as $bid => $info) {
+    if (!empty($enabled[$bid])) {
+      $options[$bid] = $info['info'];
+    }
+  }
+  asort($options);
+
+// Grab an array of human-readable module names. It hurts that we need to do this.
+  $result = db_query("SELECT name,type,info FROM {system} WHERE type = 'module' AND status = 1");
+  $modules = array();
+  while ($row = db_fetch_object($result)) {
+    $info = unserialize($row->info);
+    $modules[$row->name] = isset($info['name']) ? $info['name'] : $row->name;
+  }
+  foreach (array_diff_key($block_info, $options) as $bid => $info) {
+    $module = array_shift(explode('-', $bid));
+    $module = isset($modules[$module]) ? $modules[$module] : $module;
+    $custom_options[$module][$bid] = $info['info'];
+  }
+  $custom_options = $custom_options + array(-1 => '<'. t('Choose a block') .'>');
+  ksort($custom_options);
+
+  $form['admin_toolbar']['custom'] = array(
+		'#title' => t('Block'),
+    '#type' => 'select',
+    '#options' => $custom_options,
+    '#default_value' => -1,
+    '#element_validate' => array('admin_settings_form_custom_validate'),
+    '#description' => t('Enable other blocks for use in the admin toolbar.'),
+  );
+  $form['admin_toolbar']['add'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add block'),
+  );
+	return $form;
 }

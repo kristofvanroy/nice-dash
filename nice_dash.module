@@ -39,10 +39,19 @@ function nice_dash_menu() {
     'file' => 'nice_dash.pages.inc'
   );
 
-	$items['admin/dashboard/configure/create'] = array(
-		'title' => 'Create new dashboard',
+	$items['admin/dashboard/configure/create-dashboard'] = array(
+		'title' => 'Create dashboard',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('nice_dash_dashboard_settings_form'),
+		'access arguments' => array('administer nice dashboard'),
+		'type' => MENU_LOCAL_TASK,
+		'file' => 'nice_dash.pages.inc'
+	);
+
+	$items['admin/dashboard/configure/create-widget'] = array(
+		'title' => 'Create widget',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_widget_settings_form'),
 		'access arguments' => array('administer nice dashboard'),
 		'type' => MENU_LOCAL_TASK,
 		'file' => 'nice_dash.pages.inc'
