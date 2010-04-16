@@ -48,7 +48,9 @@ function nice_dash_dashboard_page($did = NULL) {
  */
 function nice_dash_dashboard_overview_page(){
 
+	// Dashboards
 	$dashboards = nice_dash_dashboards();
+	$output .= '<h2>'.t('Dashboards').'</h2>';
 
 	if(count($dashboards) > 0){
 		$headers = array(t('Name'), t('Actions'));
@@ -56,15 +58,37 @@ function nice_dash_dashboard_overview_page(){
 		foreach($dashboards as $dashboard){
 			$rows[] = array(
 				l($dashboard['name'], 'admin/dashboard'),
-				l(t('Edit'), 'admin/dashboard/configure/'.$dashboard['did'].'/edit').' | '.l(t('Delete'), 'admin/dashboard/configure/delete/'.$dashboard['did']));
+				l(t('Edit'), 'admin/dashboard/configure/'.$dashboard['did'].'/edit').' | '.l(t('Delete'), 'admin/dashboard/configure/'.$dashboard['did'].'/delete'));
 
 		}
-		return theme('table', $headers, $rows);
+		$output .= theme('table', $headers, $rows);
 	}
 	else {
 		drupal_set_message(t('You have to create a dashboard first. You can create your first dashboard on the <a href="@create-page">dashboard create page</a>.',array('@create-page' => url("admin/dashboard/configure/create-dashboard"))), 'warning');
-		return '';
+		$output .= '<p>'.t('No dashboards configured.').'</p>';
 	}
+
+	// Custom widgets
+	$widgets = nice_dash_custom_widgets();
+	$output .= '<h2>'.t('Widgets').'</h2>';
+
+	if(count($widgets) > 0){
+		$headers = array(t('Title'), t('Actions'));
+		$rows = array();
+		foreach($widgets as $widget){
+			$rows[] = array(
+				$widget['title'],'edit | delete'
+				//l(t('Edit'), 'admin/dashboard/configure/'.$dashboard['did'].'/edit').' | '.l(t('Delete'), 'admin/dashboard/configure/delete/'.$dashboard['did'])
+				);
+
+		}
+		$output .= theme('table', $headers, $rows);
+	}
+	else {
+		$output .= '<p>No widgets configured.</p>';
+	}
+
+	return $output;
 }
 
 

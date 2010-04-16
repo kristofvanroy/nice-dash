@@ -57,7 +57,7 @@ function nice_dash_menu() {
 		'file' => 'nice_dash.pages.inc'
 	);
 
-	 $items['admin/dashboard/configure/delete/%'] = array(
+	 $items['admin/dashboard/configure/%/delete'] = array(
 		'title' => 'Create new dashboard',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('nice_dash_dashboard_delete_form',4),
@@ -66,6 +66,24 @@ function nice_dash_menu() {
 		'file' => 'nice_dash.pages.inc'
 	);
 
+	/*$items['admin/dashboard/widget/%/delete'] = array(
+		'title' => 'Create new dashboard',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_dashboard_delete_form',4),
+		'access arguments' => array('administer nice dashboard'),
+		'type' => MENU_CALLBACK,
+		'file' => 'nice_dash.pages.inc'
+	);
+
+	 $items['admin/dashboard/widget/%/edit'] = array(
+		'title' => 'Create new dashboard',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_dashboard_delete_form',4),
+		'access arguments' => array('administer nice dashboard'),
+		'type' => MENU_CALLBACK,
+		'file' => 'nice_dash.pages.inc'
+	);
+	*/
 
  // Implement all the dashboard menu calls
  $dashboards = nice_dash_dashboards();
@@ -265,6 +283,20 @@ function nice_dash_widgets(){
  }
  return $widgets;
 }
+
+/**
+ * Fetch all the custom widgets
+ */
+function nice_dash_custom_widgets(){
+ $result = db_query("SELECT * FROM {nice_dash_widgets} WHERE custom = 1");
+
+ $widgets = array();
+ while($row = db_fetch_array($result)){
+	 $widgets[] = $row;
+ }
+ return $widgets;
+}
+
 
 function nice_dash_widget_wid($key){
  return db_result(db_query("SELECT wid FROM {nice_dash_widgets} WHERE widget_key = '%s'", $key));
