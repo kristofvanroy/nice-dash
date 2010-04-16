@@ -14,11 +14,22 @@ function nice_dash_dashboard_page($did = NULL) {
 			$did = db_result(db_query("SELECT did FROM {nice_dash_dashboards} ORDER BY weight ASC LIMIT 1"));
 		}
 
-		$result = db_query("SELECT * FROM {nice_dash_widgets} WHERE did = %d ORDER BY weight", $did);
+		$result = db_query("SELECT * FROM {nice_dash_config} c
+											  LEFT JOIN {nice_dash_widgets} w	ON c.wid = w.wid
+												WHERE did = %d
+												ORDER BY weight", $did);
 
     while($row = db_fetch_array($result)){
       if($row['region'] != 'disabled'){
-        $regions[$row['region']] .= call_user_func($widgets[$row['widget_key']]['callback']);
+
+				if($row['custom']){
+					$widget = nice_dash_get_custom_widget($row['widget_key']);
+				}
+				else {
+					$widget = call_user_func($widgets[$row['widget_key']]['callback']);
+				}
+
+        $regions[$row['region']] .= $widget;
       }
     }
   }
@@ -32,6 +43,9 @@ function nice_dash_dashboard_page($did = NULL) {
 
 }
 
+/**
+ * Overview page with the dashboards and custom widgets.
+ */
 function nice_dash_dashboard_overview_page(){
 
 	$dashboards = nice_dash_dashboards();
@@ -63,20 +77,21 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
 	if(isset($did)){
 		$dashboard = nice_dash_dashboard_values($did);
 	}
-  $widgets = module_invoke_all('nice_dash_widgets');
+
+	$widgets = nice_dash_widgets();
 
   if($widgets){
 
 		$form['#tree'] = TRUE;
 		$form['#theme'] = 'nice_dash_settings_form';
 
-    foreach($widgets as $key => $value){
+    foreach($widgets as $widget){
       //Fetch values
-      $default_values = nice_dash_widget_values($key, $did);
+      $default_values = nice_dash_widget_values($widget['wid'], $did);
 
-      $form['#widgets'][] = $key;
-      $form[$key]['title'] = array('#value' => $value['title']);
-      $form[$key]['region'] = array(
+      $form['#widgets'][] = $widget['wid'];
+      $form[$widget['wid']]['title'] = array('#value' => $widget['title']);
+      $form[$widget['wid']]['region'] = array(
         '#type' => 'select',
         '#options' => nice_dash_regions(),
         '#default_value' => $default_values['region'],
@@ -84,7 +99,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
           'class' => 'field-region-select field-region-disabled ',
         ),
       );
-      $form[$key]['weight'] = array('#type' => 'weight', '#delta' => 1, '#default_value' => $default_values['weight']);
+      $form[$widget['wid']]['weight'] = array('#type' => 'weight', '#delta' => 1, '#default_value' => $default_values['weight']);
     }
 
     $form['widgets'] = array('#type' => 'value', '#value' => $form['#widgets']);
@@ -110,7 +125,6 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
 
 	// Current dashboard id
 	$form['dashboard_id'] = array('#type' => 'value', '#value' => $did);
-
   return $form;
 }
 
@@ -144,22 +158,25 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
 	// Widgets
 
   if (sizeof($values['widgets']) > 0) {
-    foreach($values['widgets'] as $key){
+    foreach($values['widgets'] as $wid){
+
       $widget = new stdClass();
       $update_keys = array();
 
       // Check if row exists
-      $wid = db_result(db_query("SELECT wid FROM {nice_dash_widgets} WHERE widget_key = '%s' AND did = %d", $key, $values['dashboard_id']));
-      if(is_numeric($wid)){
-        $widget->wid = $wid;
-        $update_keys = array('wid');
-      }
-			$widget->did = $values['dashboard_id'];
-      $widget->widget_key = $key;
-      $widget->region = $values[$key]['region'];
-      $widget->weight = $values[$key]['weight'];
+      $db_wid = db_result(db_query("SELECT wid FROM {nice_dash_config} WHERE wid = %d AND did = %d", $wid, $values['dashboard_id']));
 
-      drupal_write_record('nice_dash_widgets', $widget, $update_keys);
+			$widget->wid = $wid;
+			$widget->did = $values['dashboard_id'];
+      $widget->region = $values[$wid]['region'];
+      $widget->weight = $values[$wid]['weight'];
+
+			if(is_numeric($db_wid)){
+				$widget->wid = $db_wid;
+        $update_keys = array('wid','did');
+      }
+
+      drupal_write_record('nice_dash_config', $widget, $update_keys);
     }
   }
 
@@ -201,7 +218,7 @@ function nice_dash_widget_settings_form(){
 
 	$form['title'] = array(
 		'#type' => 'textfield',
-		'#title' => t('Widget title'),
+		'#title' => t('Title'),
 		'#size' => 60,
 		'#required' => TRUE,
 	);
@@ -225,7 +242,6 @@ function nice_dash_widget_settings_form(){
 
   // Get default block options.
   $options = array();
-  $enabled = array_filter(admin_get_settings('blocks')) + admin_get_default_blocks(TRUE);
   foreach ($block_info as $bid => $info) {
     if (!empty($enabled[$bid])) {
       $options[$bid] = $info['info'];
@@ -233,7 +249,6 @@ function nice_dash_widget_settings_form(){
   }
   asort($options);
 
-// Grab an array of human-readable module names. It hurts that we need to do this.
   $result = db_query("SELECT name,type,info FROM {system} WHERE type = 'module' AND status = 1");
   $modules = array();
   while ($row = db_fetch_object($result)) {
@@ -248,17 +263,27 @@ function nice_dash_widget_settings_form(){
   $custom_options = $custom_options + array(-1 => '<'. t('Choose a block') .'>');
   ksort($custom_options);
 
-  $form['admin_toolbar']['custom'] = array(
+  $form['block'] = array(
 		'#title' => t('Block'),
     '#type' => 'select',
     '#options' => $custom_options,
     '#default_value' => -1,
-    '#element_validate' => array('admin_settings_form_custom_validate'),
-    '#description' => t('Enable other blocks for use in the admin toolbar.'),
   );
-  $form['admin_toolbar']['add'] = array(
+  $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Add block'),
+    '#value' => t('Add widget'),
   );
 	return $form;
+}
+
+function nice_dash_widget_settings_form_submit(&$form, &$form_state){
+	$values = $form_state['values'];
+
+	$widget = new stdClass();
+	$widget->widget_key = $values['block'];
+	$widget->title = $values['title'];
+	$widget->description = $values['description'];
+	$widget->custom = 1;
+
+	drupal_write_record('nice_dash_widgets', $widget);
 }

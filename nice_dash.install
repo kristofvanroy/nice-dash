@@ -52,21 +52,47 @@ function nice_dash_schema() {
         'length' => '128',
         'not null' => TRUE,
       ),
-      'did' => array(
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'custom' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('wid'),
+  );
+
+  $schema['nice_dash_config'] = array(
+    'fields' => array(
+      'wid' => array(
         'type' => 'int',
         'not null' => TRUE,
       ),
-      'region' => array(
-        'type' => 'varchar',
-        'length' => '15',
+      'did' => array(
+        'type' => 'int',
         'not null' => TRUE,
       ),
       'weight' => array(
         'type' => 'int',
         'not null' => TRUE,
+        'default' => 0,
+      ),
+      'region' => array(
+        'type' => 'varchar',
+        'length' => '25',
+        'not null' => TRUE,
       ),
     ),
-    'primary key' => array('wid', 'widget_key', 'did'),
+    'primary key' => array('wid', 'did', 'weight'),
   );
 
   return $schema;
