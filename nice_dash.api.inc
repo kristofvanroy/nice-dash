@@ -1,6 +1,13 @@
 <?php
 
 /**
+ *
+ * TODO: CLEAN UP THIS API
+ * - Duplicate functionalities
+ *
+ */
+
+/**
  * Dashboard regions
  *
  * @return: An array of layout regions available for widgets
@@ -18,15 +25,21 @@ function nice_dash_regions() {
 /**
  * Fetch widget values
  */
-function nice_dash_widget_values($wid, $did){
- // Fetch wid
- //$wid = nice_dash_widget_wid($key);
+function nice_dash_widget_values($wid, $did = NULL){
 
- //
- $result = db_query("SELECT region, weight FROM {nice_dash_config} c LEFT JOIN {nice_dash_° WHERE wid = %d AND did = %d", $wid, $did);
+ // If dashboard ID is supplied only give back dashboard region and weight
+ if($did){
+  $sql = 'SELECT region, weight FROM {nice_dash_config} WHERE wid = %d AND did = %d';
+ }
+ else {
+	$sql = 'SELECT * FROM {nice_dash_widgets} WHERE wid = %d';
+ }
+
+ $result = db_query($sql, $wid, $did);
  while($row = db_fetch_array($result)){
    return $row;
  }
+ 
  // If empty
  return nice_dash_widget_default_values();
 }
@@ -80,7 +93,9 @@ function nice_dash_custom_widgets(){
  return $widgets;
 }
 
-
+/**
+ * Check if a widget key exists in the db
+ */
 function nice_dash_widget_wid($key){
  return db_result(db_query("SELECT wid FROM {nice_dash_widgets} WHERE widget_key = '%s'", $key));
 }
@@ -101,6 +116,24 @@ function nice_dash_widget_default_values(){
 function nice_dash_remove_widget($wid){
 	db_query("DELETE FROM {nice_dash_config} WHERE wid = %d", $wid);
 	db_query("DELETE FROM {nice_dash_widgets} WHERE wid = %d", $wid);
+}
+
+/**
+ * Get the custom widget block
+ */
+function nice_dash_get_custom_widget($bid){
+  $split = explode('-', $bid, 2);
+  if (count($split) === 2) {
+		 list($module, $delta) = $split;
+		 $block = module_invoke($module, 'block', 'view', $delta);
+		 if (!empty($block['content'])) {
+			 if ($module === 'block') {
+				 global $theme;
+				 $block['subject'] = db_result(db_query("SELECT title FROM {blocks} WHERE module = 'block' AND delta = '%s'", $delta));
+			 }
+		 }
+	}
+	return $block['content'];
 }
 
 /**
@@ -139,20 +172,3 @@ function nice_dash_remove_dashboard($did){
 	module_invoke('menu','rebuild');
 }
 
-/**
- * Get the custom widget block
- */
-function nice_dash_get_custom_widget($bid){
-  $split = explode('-', $bid, 2);
-  if (count($split) === 2) {
-		 list($module, $delta) = $split;
-		 $block = module_invoke($module, 'block', 'view', $delta);
-		 if (!empty($block['content'])) {
-			 if ($module === 'block') {
-				 global $theme;
-				 $block['subject'] = db_result(db_query("SELECT title FROM {blocks} WHERE module = 'block' AND delta = '%s'", $delta));
-			 }
-		 }
-	}
-	return $block['content'];
-}

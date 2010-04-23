@@ -70,7 +70,7 @@ function nice_dash_dashboard_overview_page(){
 
 	$regions['left'] = $output;
 
-	// Custom widgets
+	// Widgets
 	$output = '';
 
 	$widgets = nice_dash_custom_widgets();
@@ -160,7 +160,6 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
 
 function nice_dash_dashboard_settings_form_validate(&$form, &$form_state){
 	// CHECK IF THE NAME OF THE DASHBOARD DOES NOT YET EXIST
-
 }
 
 /**
@@ -248,13 +247,18 @@ function nice_dash_dashboard_delete_form_submit($form, &$form_state) {
   drupal_goto('admin/dashboard/configure');
 }
 
-function nice_dash_widget_settings_form(){
+function nice_dash_widget_settings_form(&$form_state, $wid = NULL){
+
+	if(isset($wid)){
+		$widget = nice_dash_widget_values($wid);
+	}
 
 	$form['title'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Title'),
 		'#size' => 60,
 		'#required' => TRUE,
+		'#default_value' => $widget['title'],
 	);
 
 	$form['description'] = array(
@@ -262,6 +266,7 @@ function nice_dash_widget_settings_form(){
 		'#title' => t('Description'),
 		'#size' => 60,
 		'#required' => TRUE,
+		'#default_value' => $widget['description'],
 	);
 
 	$block_info = array();
@@ -297,11 +302,19 @@ function nice_dash_widget_settings_form(){
   $custom_options = $custom_options + array(-1 => '<'. t('Choose a block') .'>');
   ksort($custom_options);
 
+	// Default value from block select
+	if($widget['widget_key']){
+		$block_default = $widget['widget_key'];
+	}
+	else {
+		$block_default = -1;
+	}
+
   $form['block'] = array(
 		'#title' => t('Block'),
     '#type' => 'select',
     '#options' => $custom_options,
-    '#default_value' => -1,
+    '#default_value' => $block_default,
   );
 
   $form['submit'] = array(
@@ -309,6 +322,7 @@ function nice_dash_widget_settings_form(){
     '#value' => t('Add widget'),
   );
 
+	$form['wid'] = array('#type' => 'value', '#value' => $wid);
 	$form['#redirect'] = 'admin/dashboard/configure';
 
 	return $form;
@@ -316,6 +330,7 @@ function nice_dash_widget_settings_form(){
 
 function nice_dash_widget_settings_form_submit(&$form, &$form_state){
 	$values = $form_state['values'];
+	$update_keys = array();
 
 	$widget = new stdClass();
 	$widget->widget_key = $values['block'];
@@ -323,7 +338,12 @@ function nice_dash_widget_settings_form_submit(&$form, &$form_state){
 	$widget->description = $values['description'];
 	$widget->custom = 1;
 
-	drupal_write_record('nice_dash_widgets', $widget);
+	if($values['wid']){
+		$update_keys = array('wid');
+		$widget->wid = $values['wid'];
+	}
+
+	drupal_write_record('nice_dash_widgets', $widget, $update_keys);
 
 	//Succes
 	drupal_set_message(t('The widget has been saved'));
