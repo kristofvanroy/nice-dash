@@ -1,14 +1,33 @@
 ABOUT
 -----
-This module makes the lifes of editors and webmasters a bit easier. We want to make it as easy as possible for Drupal end-users to have all the tools at a central spot. In trainings with customers it was sometimes very hard to explain how to get at the right spots to alter content. As a webmaster they can create a dashboard with all the widgets you think are needed the most. 
+This module makes the lifes of editors and webmasters a bit easier. We want to make it as easy as possible for Drupal end-users to have all the tools at a central spot. In trainings with customers it was sometimes very hard to explain how to get at the right spots to alter content. As a webmaster they can create a dashboard with all the widgets you think are needed the most.
 
 RECOMMENDATIONS
 ---------------
-We use this module in combination with the Rubik theme from Develomentseed (http://code.developmentseed.org/rubik/node/239), it simply looks clean in this theme. We also use the admin 2 module which is at this moment still in development (http://drupal.org/project/admin). 
+We use this module in combination with the Rubik theme from Develomentseed (http://code.developmentseed.org/rubik/node/239), it simply looks clean in this theme. We also use the admin 2 module which is at this moment still in development (http://drupal.org/project/admin).
+
+FUTURE ROADMAP
+--------------
+Release 1.1
+- API
+- API documentation
+- Custom widgets
+- GA widgets
+- Review existing widgets
+- Dashboard help texts
+- Content manager upgrade
+
+Release 1.2
+- Drag dashboard order
+- Quick link widgets ? Hook?
+
+Release 1.3
+- Features support / Exportables
 
 LATEST FIXES
 ------------
 DONE - Hide exposed filters
+
 
 FEATURE REQUESTS
 ----------------
@@ -31,5 +50,4 @@ kristofvanroy (http://drupal.org/user/382101)
 
 SPONSORS
 --------
-This module is sponsored by www.nascom.be. 
-
+This module is sponsored by www.nascom.be.
