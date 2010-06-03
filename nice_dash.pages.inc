@@ -59,7 +59,7 @@ function nice_dash_dashboard_overview_page(){
 		foreach($dashboards as $dashboard){
 			$rows[] = array(
 				l($dashboard['name'], 'admin/dashboard'),
-				l(t('Edit'), 'admin/dashboard/configure/'.$dashboard['did'].'/edit').' | '.l(t('Delete'), 'admin/dashboard/configure/'.$dashboard['did'].'/delete'));
+				l(t('View'), 'admin/dashboard/'.$dashboard['did']).' | '.l(t('Edit'), 'admin/dashboard/configure/'.$dashboard['did'].'/edit').' | '.l(t('Delete'), 'admin/dashboard/configure/'.$dashboard['did'].'/delete'));
 
 		}
 		$output .= theme('table', $headers, $rows);
