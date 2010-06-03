@@ -266,7 +266,6 @@ function nice_dash_widget_settings_form(&$form_state, $wid = NULL){
 		'#type' => 'textfield',
 		'#title' => t('Description'),
 		'#size' => 60,
-		'#required' => TRUE,
 		'#default_value' => $widget['description'],
 	);
 
