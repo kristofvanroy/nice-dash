@@ -317,10 +317,14 @@ function nice_dash_widget_settings_form(&$form_state, $wid = NULL){
     '#default_value' => $block_default,
   );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add widget'),
-  );
+  $form['submit']['#type'] = 'submit';
+
+  if ($wid) {
+    $form['submit']['#value'] = t('Save changes');
+  }
+  else {
+    $form['submit']['#value'] = t('Add widget');
+  }
 
 	$form['wid'] = array('#type' => 'value', '#value' => $wid);
 	$form['#redirect'] = 'admin/dashboard/configure';
