@@ -37,6 +37,11 @@ function nice_dash_widget_values($wid, $did = NULL){
 
  $result = db_query($sql, $wid, $did);
  while($row = db_fetch_array($result)){
+   //if no region set to disabled
+   if (!$row['region']) {
+     $row['region'] = 'disabled';
+   }
+ 
    return $row;
  }
  
