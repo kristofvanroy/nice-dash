@@ -6,7 +6,6 @@
 function nice_dash_dashboard_page($did = NULL) {
 
   $widgets = module_invoke_all('nice_dash_widgets');
-
   if($widgets){
 
 		// Fetch the default dashboard
@@ -26,7 +25,9 @@ function nice_dash_dashboard_page($did = NULL) {
 					$widget = nice_dash_get_custom_widget($row['widget_key']);
 				}
 				else {
-					$widget = call_user_func($widgets[$row['widget_key']]['callback']);
+				  if (function_exists($widgets[$row['widget_key']]['callback']))  {
+  					$widget = call_user_func($widgets[$row['widget_key']]['callback']);
+  				}
 				}
 
         $regions[$row['region']] .= $widget;
