@@ -55,7 +55,7 @@ function nice_dash_menu() {
 	 $items['admin/dashboard/configure/%/delete'] = array(
 		'title' => 'Create new dashboard',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('nice_dash_dashboard_delete_form',4),
+    'page arguments' => array('nice_dash_dashboard_delete_form',3),
 		'access arguments' => array('administer nice dashboard'),
 		'type' => MENU_CALLBACK,
 		'file' => 'nice_dash.pages.inc'

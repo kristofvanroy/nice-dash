@@ -172,7 +172,7 @@ function nice_dash_dashboards(){
  */
 function nice_dash_remove_dashboard($did){
 	db_query("DELETE FROM {nice_dash_dashboards} WHERE did = %d", $did);
-	db_query("DELETE FROM {nice_dash_widgets} WHERE did = %d", $did);
+	db_query("DELETE FROM {nice_dash_config} WHERE did = %d", $did);
 	// Clear them from the menu
 	module_invoke('menu','rebuild');
 }
