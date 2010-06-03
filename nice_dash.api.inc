@@ -126,7 +126,8 @@ function nice_dash_remove_widget($wid){
 /**
  * Get the custom widget block
  */
-function nice_dash_get_custom_widget($bid){
+function nice_dash_get_custom_widget($widget){
+  $bid = $widget['widget_key'];
   $split = explode('-', $bid, 2);
   if (count($split) === 2) {
 		 list($module, $delta) = $split;
@@ -138,7 +139,7 @@ function nice_dash_get_custom_widget($bid){
 			 }
 		 }
 	}
-	return $block['content'];
+	return theme('nice_dash_component', $widget['title'], $widget['description'], $block['content']);
 }
 
 /**

@@ -22,7 +22,7 @@ function nice_dash_dashboard_page($did = NULL) {
       if($row['region'] != 'disabled'){
 
 				if($row['custom']){
-					$widget = nice_dash_get_custom_widget($row['widget_key']);
+					$widget = nice_dash_get_custom_widget($row);
 				}
 				else {
 				  if (function_exists($widgets[$row['widget_key']]['callback']))  {
