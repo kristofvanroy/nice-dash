@@ -207,7 +207,7 @@ function nice_dash_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks['dashboard'] = array(
         'info' => t('Dashboard'),
         'admin' => TRUE,
-        'cache' => FALSE,
+        'cache' => BLOCK_CACHE_PER_ROLE,
         'weight' => -1,
       );
       return $blocks;
