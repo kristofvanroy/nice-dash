@@ -177,6 +177,15 @@ function _nice_dash_menu() {
 
     foreach ($dashboards as $dashboard) {
 
+      $items['admin/dashboard/configure/'. $dashboard->did .'/edit'] = array(
+        'title' => 'Edit '. $dashboard->name,
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('nice_dash_dashboard_settings_form', 3),
+        'access arguments' => array('administer nice dashboard'),
+        'type' => MENU_CALLBACK,
+        'file' => 'nice_dash.pages.inc'
+      );
+
       if ($first) {
         $type = MENU_DEFAULT_LOCAL_TASK;
         $first = FALSE;

@@ -224,12 +224,7 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
 
   drupal_write_record('nice_dash_dashboards', $dashboard, $update_keys);
 
-  if (!isset($values['dashboard_id'])) {
-    $values['dashboard_id'] = db_last_insert_id('nice_dash_dasboard', 'did');
-  }
-
   // Widgets
-
   if (sizeof($values['widgets']) > 0) {
     foreach ($values['widgets'] as $wid) {
 
@@ -237,10 +232,10 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
       $update_keys = array();
 
       // Check if row exists
-      $db_wid = db_result(db_query("SELECT wid FROM {nice_dash_config} WHERE wid = %d AND did = %d", $wid, $values['dashboard_id']));
+      $db_wid = db_result(db_query("SELECT wid FROM {nice_dash_config} WHERE wid = %d AND did = %d", $wid, $dashboard->did));
 
       $widget->wid = $wid;
-      $widget->did = $values['dashboard_id'];
+      $widget->did = $dashboard->did;
       $widget->region = $values[$wid]['region'];
       $widget->weight = $values[$wid]['weight'];
 
@@ -277,7 +272,7 @@ function nice_dash_dashboard_delete_form($form_state, $did) {
 
   return confirm_form(
     $form,
-    t('Are your sure you want to delete the dashboard %name', array('%name' => $dashboard['name'])),
+    t('Are your sure you want to delete the dashboard %name', array('%name' => $dashboard->name)),
     'admin/dashboard/configure',
     t('This action cannot be undone.'),
     t('Delete')
