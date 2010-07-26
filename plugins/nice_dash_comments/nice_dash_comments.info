@@ -1,6 +1,0 @@
-name = Nice Dash Comments Plugin
-description = Comment widgets for nice dash
-package = Nice dashboard
-dependencies[] = nice_dash
-dependencies[] = comment
-core = 6.x

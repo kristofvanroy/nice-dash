@@ -1,11 +1,16 @@
 <?php
 
 /**
+ * @file
+ * Install file.
+ */
+
+/**
  * Implementation of hook_install().
  */
 function nice_dash_install() {
   drupal_install_schema('nice_dash');
-  drupal_set_message(t('Nice dash is succesfully installed, you can change <a href="@settings-page">the dashboard settings here</a>.',array('@settings-page' => url("admin/dashboard/settings"))));
+  drupal_set_message(t('Nice dash is succesfully installed, you can change <a href="@settings-page">the dashboard settings here</a>.', array('@settings-page' => url("admin/dashboard/settings"))));
 }
 
 /**
@@ -13,6 +18,7 @@ function nice_dash_install() {
  */
 function nice_dash_uninstall() {
   drupal_uninstall_schema('nice_dash');
+  variable_del('nice_dash_redirect_after_login');
   drupal_set_message(t('Nice dash is succesfully uninstalled.'));
 }
 
@@ -48,6 +54,11 @@ function nice_dash_schema() {
         'not null' => TRUE,
       ),
       'widget_key' => array(
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'widget_plugin' => array(
         'type' => 'varchar',
         'length' => '128',
         'not null' => TRUE,
@@ -96,4 +107,13 @@ function nice_dash_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implementation of hook_update_N().
+ */
+function nice_dash_update_6201() {
+  $ret = array();
+  db_add_field($ret, 'nice_dash_widgets', 'widget_plugin', array('type' => 'varchar', 'not null' => TRUE, 'length' => '128', 'default' => ''));
+  return $ret;
 }

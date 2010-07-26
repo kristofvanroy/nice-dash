@@ -1,9 +1,14 @@
 <?php
 
 /**
- * Implementation of hook_views_default_views().
+ * @file
+ * Default views for content plugin.
  */
-function nice_dash_content_views_default_views() {
+
+/**
+ * Implementation of hook_views().
+ */
+function nice_dash_content_views() {
   $view = new view;
   $view->name = 'nice_dash_content';
   $view->description = 'Nice dash content views';
@@ -12,7 +17,7 @@ function nice_dash_content_views_default_views() {
   $view->base_table = 'node';
   $view->is_cacheable = FALSE;
   $view->api_version = 2;
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+  $view->disabled = TRUE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Default', 'default');
   $handler->override_option('fields', array(
     'title' => array(

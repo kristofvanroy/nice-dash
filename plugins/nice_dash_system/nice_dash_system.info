@@ -1,5 +1,0 @@
-name = Nice Dash System Plugin
-description = System widgets for Nice Dash
-package = Nice dashboard
-dependencies[] = nice_dash
-core = 6.x

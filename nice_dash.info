@@ -2,3 +2,4 @@ name = Nice Dash
 description = This modules enables webmasters to create a widget like dashboard
 package = Nice dashboard
 core = 6.x
+dependencies[] = ctools

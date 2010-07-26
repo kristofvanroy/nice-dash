@@ -1,6 +1,0 @@
-name = Nice Dash Scheduler Plugin
-description = Scheduler widgets for Nice Dash
-package = Nice dashboard
-dependencies[] = nice_dash
-dependencies[] = scheduler
-core = 6.x

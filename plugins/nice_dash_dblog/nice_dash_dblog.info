@@ -1,8 +1,0 @@
-name = Nice Dash dblog Plugin
-description = Database logging widgets for Nice Dash
-package = Nice dashboard
-dependencies[] = nice_dash
-dependencies[] = views_watchdog
-dependencies[] = dblog
-dependencies[] = syslog
-core = 6.x
