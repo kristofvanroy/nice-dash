@@ -19,6 +19,7 @@ The code has also been moved around a bit for readability, consistency and simpl
   but they still work, that's the beauty of it all :)
 - 'edit' dashboard menu calls are now simple menu callbacks, there's a list
   with a lot of dashboards (you never know), this would clutter up the interface.
+- Validation of dashboard unique name, and also on letters, numbers etc.
 
 Todo
 ----

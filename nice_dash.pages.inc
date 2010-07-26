@@ -130,7 +130,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
     $form['#theme'] = 'nice_dash_settings_form';
 
     foreach ($widgets as $widget) {
-      // Fetch values
+      // Fetch values for the widget.
       $default_values = _nice_dash_widget_values($widget->wid, $did);
 
       $form['#widgets'][] = $widget->wid;
@@ -167,7 +167,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
     '#weight' => -100,
   );
 
-  // Current dashboard id
+  // Current dashboard id.
   $form['dashboard_id'] = array('#type' => 'value', '#value' => $did);
   return $form;
 }
@@ -177,7 +177,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
  */
 function _nice_dash_widget_values($wid, $did = NULL) {
 
-  // If dashboard ID is supplied only give back dashboard region and weight
+  // If dashboard ID is supplied only give back dashboard region and weight.
   if ($did) {
     $sql = 'SELECT region, weight FROM {nice_dash_config} WHERE wid = %d AND did = %d';
   }
@@ -203,8 +203,29 @@ function _nice_dash_widget_values($wid, $did = NULL) {
   );
 }
 
+/**
+ * Settings form validate handler.
+ */
 function nice_dash_dashboard_settings_form_validate(&$form, &$form_state) {
-  // CHECK IF THE NAME OF THE DASHBOARD DOES NOT YET EXIST
+  $values = $form_state['values'];
+  $did = $values['dashboard_id'];
+  $dashboard_name = $values['dashboard_name'];
+
+  $query_values = array($dashboard_name);
+  $query = "SELECT name FROM {nice_dash_dashboards} WHERE name = '%s'";
+
+  if (!empty($did)) {
+    $query .= ' AND did != %d';
+    $query_values[] = $did;
+  }
+
+  if (db_result(db_query($query, $query_values))) {
+    form_set_error('dashboard_name', t('Dashboard name %dashboard_name already exists.', array('%dashboard_name' => $dashboard_name)));
+  }
+
+  if (!preg_match('!^[ A-Za-z0-9_-]+$!', $dashboard_name)) {
+    form_set_error('dashboard_name', t('The dashboard name must contain only uppercase and lowercase letters, underscores or hyphens.'));
+  }
 }
 
 /**
@@ -218,10 +239,12 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
   $dashboard = new stdClass();
   $dashboard->name = $values['dashboard_name'];
 
-  if (isset($values['dashboard_id'])) {
+  if (isset($values['dashboard_id']) && !empty($values['dashboard_id'])) {
     $update_keys = array('did');
+    $dashboard->did = $values['dashboard_id'];
   }
 
+  // Save dashboard.
   drupal_write_record('nice_dash_dashboards', $dashboard, $update_keys);
 
   // Widgets
@@ -244,6 +267,7 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
         $update_keys = array('wid', 'did');
       }
 
+      // Save widget.
       drupal_write_record('nice_dash_config', $widget, $update_keys);
     }
   }
