@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @file
+ * Settings form template file.
+ */
+
 print $above_widget_settings;
 
 if ($rows): ?>

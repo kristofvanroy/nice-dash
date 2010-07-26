@@ -1,3 +1,11 @@
+<?php
+
+/**
+ * @file
+ * Dashbaord template file.
+ */
+?>
+
 <div id="nice-dashboard">
   <div><?php print $regions['header']; ?></div>
   <div class="left"><?php print $regions['left']; ?></div>

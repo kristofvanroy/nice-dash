@@ -1,70 +1,84 @@
 <?php
 
+/**
+ * @file
+ * Theming functions for Nice Dashboard.
+ */
 
 /**
- * Theme callback for the dashboard page
+ * Theme callback for the dashboard page.
  */
-function template_preprocess_nice_dash_page(&$vars){
-	drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/dashboard.js');
+function template_preprocess_nice_dash_page(&$vars) {
+
+  // Set the variable of the region even when empty.
+  $regions = nice_dash_regions();
+  foreach ($regions as $key => $name) {
+    if (!isset($vars['regions'][$key])) {
+      $vars['regions'][$key] = '';
+    }
+  }
+
+  // Add markup.
+  drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/dashboard.js');
   drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
 }
 
 
 /**
- * Preprocess function from the dashboard setting form
+ * Preprocess function from the dashboard setting form.
  *
- * Here the regions are added
+ * Here the regions are added.
  */
 function template_preprocess_nice_dash_settings_form(&$vars) {
   $form = &$vars['form'];
 
-	$vars['above_widget_settings'] = drupal_render($form['dashboard_name']);
-	$vars['below_widget_settings'] = '';
+  $vars['above_widget_settings'] = drupal_render($form['dashboard_name']);
+  $vars['below_widget_settings'] = '';
 
   // Order the widgets
   $order = array();
-	if(sizeof($form['#widgets'])){
-		foreach ($form['#widgets'] as $key => $field) {
-			$order[$field] = $form[$field]['weight']['#default_value'];
-		}
-		asort($order);
+  if (sizeof($form['#widgets'])) {
+    foreach ($form['#widgets'] as $key => $field) {
+      $order[$field] = $form[$field]['weight']['#default_value'];
+    }
+    asort($order);
 
-		$rows = array();
-		foreach ($order as $key => $field) {
-			$element = &$form[$key];
-			$row = new stdClass();
+    $rows = array();
+    foreach ($order as $key => $field) {
+      $element = &$form[$key];
+      $row = new stdClass();
 
-			// Each field will have a region, store it temporarily
-			$region = $element['region']['#default_value'];
+      // Each field will have a region, store it temporarily.
+      $region = $element['region']['#default_value'];
 
-			foreach (element_children($element) as $child) {
-				if ($child == 'weight') {
-					$element['weight']['#attributes']['class'] = 'field-weight field-weight-'. $region;
-					$element['weight'] = process_weight($element['weight']);
-				}
-				$row->{$child} = drupal_render($element[$child]);
-			}
+      foreach (element_children($element) as $child) {
+        if ($child == 'weight') {
+          $element['weight']['#attributes']['class'] = 'field-weight field-weight-'. $region;
+          $element['weight'] = process_weight($element['weight']);
+        }
+        $row->{$child} = drupal_render($element[$child]);
+      }
 
-			// Add draggable.
-			$row->class = 'draggable';
-			if ($region == 'disabled') {
-				$row->class .= ' region-css-'. $region;
-			}
-			$rows[$region][] = $row;
-		}
+      // Add draggable.
+      $row->class = 'draggable';
+      if ($region == 'disabled') {
+        $row->class .= ' region-css-'. $region;
+      }
+      $rows[$region][] = $row;
+    }
 
-		drupal_add_js('misc/tableheader.js');
-		drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/widgets.js');
-		drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
+    drupal_add_js('misc/tableheader.js');
+    drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/widgets.js');
+    drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
 
-		$regions = nice_dash_regions();
+    $regions = nice_dash_regions();
 
-		foreach ($regions as $region => $title) {
-			drupal_add_tabledrag('fields', 'match', 'sibling', 'field-region-select', 'field-region-'. $region, NULL, FALSE);
-			drupal_add_tabledrag('fields', 'order', 'sibling', 'field-weight', 'field-weight-'. $region);
-		}
-	}
+    foreach ($regions as $region => $title) {
+      drupal_add_tabledrag('fields', 'match', 'sibling', 'field-region-select', 'field-region-'. $region, NULL, FALSE);
+      drupal_add_tabledrag('fields', 'order', 'sibling', 'field-weight', 'field-weight-'. $region);
+    }
+  }
   $vars['rows'] = $rows;
   $vars['submit'] = drupal_render($form);
-	$vars['regions'] = $regions;
+  $vars['regions'] = $regions;
 }
