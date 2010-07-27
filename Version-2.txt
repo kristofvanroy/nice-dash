@@ -7,27 +7,28 @@ We are now dependant on cTools. All plugins are no modules anymore but
 are simple classes registered with the plugin system of cTools.
 
 The code has also been moved around a bit for readability, consistency and simplicity:
-- checks on permissions; 
-- moved some API calls to there respective functions (deleting a dashboard)
-- registry file for plugins, menu & theme (and soon dashboards & widgets)
-- deleted api.inc file for now - don't see a real plus in it right now - should rather
+- Coder check.
+- Checks on permissions; 
+- Moved some API calls to there respective functions (deleting a dashboard)
+- Registry file for plugins, menu & theme (and soon dashboards & widgets)
+- Deleted api.inc file for now - don't see a real plus in it right now - should rather
   become a base class if we really need it in the near future (at least, that's my idea).
 - One API function for getting widgets & dashboards, much easier to maintain. (nice_dash_get_object)
 - Custom widgets functionality has been moved to nice_dash plugin
-- Coder check.
 - Views are all disabled by default - this way, they don't show up on the blocks page,
   but they still work, that's the beauty of it all :)
 - 'edit' dashboard menu calls are now simple menu callbacks, there's a list
   with a lot of dashboards (you never know), this would clutter up the interface.
 - Validation of dashboard unique name, and also on letters, numbers etc.
+- settings ui: redirect after login (false by default)
 
 Todo
 ----
-- settings ui: redirect after login (false by default)
 - Revise all default views, they have 'unknown' properties (mostly language related)
 
 Roadmap / ideas
 ---------------
+- Permission of dashboard per role 
 - Take over admin path
 - Revise plugin system - do we really want classes or not.
 - dashboards & custom widgets - exportables & features via ctools 

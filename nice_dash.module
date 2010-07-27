@@ -121,7 +121,6 @@ function nice_dash_block($op = 'list', $delta = 0, $edit = array()) {
       'weight' => -1,
       ),
     );
-    return $blocks;
   }
   elseif ($op == 'view') {
     $block['subject'] = t('Dashboard');

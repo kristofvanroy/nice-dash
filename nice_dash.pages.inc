@@ -460,6 +460,23 @@ function nice_dash_widget_delete_form_submit($form, &$form_state) {
 }
 
 /**
+ * Settings for Nice dash.
+ */
+function nice_dash_settings($form_state) {
+  $form = array();
+
+  $form['nice_dash_redirect_after_login'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Redirect after login'),
+    '#description' => t('Toggle this checkbox to redirect to the dashboard after login.'),
+    '#default_value' => variable_get('nice_dash_redirect_after_login', FALSE),
+  );
+
+  $form = system_settings_form($form);
+  return $form;
+}
+
+/**
  * Function to return an array of layout regions available for widgets.
  */
 function nice_dash_regions() {

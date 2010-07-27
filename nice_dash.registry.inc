@@ -113,12 +113,24 @@ function _nice_dash_menu() {
     'file' => 'nice_dash.pages.inc'
   );
 
+
+  $weight = 0;
   $items['admin/dashboard/configure/overview'] = array(
     'title' => 'Overview',
     'page callback' => 'nice_dash_dashboard_overview_page',
     'access arguments' => array('administer nice dashboard'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -1,
+    'weight' => $weight++,
+    'file' => 'nice_dash.pages.inc'
+  );
+
+  $items['admin/dashboard/configure/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_settings'),
+    'access arguments' => array('administer nice dashboard'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => $weight++,
     'file' => 'nice_dash.pages.inc'
   );
 
@@ -128,6 +140,7 @@ function _nice_dash_menu() {
     'page arguments' => array('nice_dash_dashboard_settings_form'),
     'access arguments' => array('administer nice dashboard'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => $weight++,
     'file' => 'nice_dash.pages.inc'
   );
 
@@ -147,6 +160,7 @@ function _nice_dash_menu() {
     'page arguments' => array('nice_dash_widget_settings_form'),
     'access arguments' => array('administer nice dashboard'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => $weight++,
     'file' => 'nice_dash.pages.inc'
   );
 
