@@ -35,14 +35,19 @@ class nice_dash_scheduler {
    * Content to be unpublished
    */
   function nice_dash_scheduler_widget_scheduler_unpublish() {
-    return theme('nice_dash_component', t('Scheduled to unpublish'), '', views_embed_view('nice_dash_scheduler', 'block_4'));
-
+    return array(
+      'title' => t('Scheduled to unpublish'),
+      'content' => views_embed_view('nice_dash_scheduler', 'block_4'),
+    );
   }
 
   /**
    * Content to be unpublished
    */
   function nice_dash_scheduler_widget_scheduler_publish() {
-    return theme('nice_dash_component', t('Scheduled to publish'), '', views_embed_view('nice_dash_scheduler', 'block_5'));
+    return array(
+      'title' => t('Scheduled to publish'),
+      'content' => views_embed_view('nice_dash_scheduler', 'block_5'),
+    );
   }
 }

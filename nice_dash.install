@@ -43,6 +43,10 @@ function nice_dash_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'access' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
     ),
     'primary key' => array('did'),
   );
@@ -115,5 +119,6 @@ function nice_dash_schema() {
 function nice_dash_update_6201() {
   $ret = array();
   db_add_field($ret, 'nice_dash_widgets', 'widget_plugin', array('type' => 'varchar', 'not null' => TRUE, 'length' => '128', 'default' => ''));
+  db_add_field($ret, 'nice_dash_dashboards', 'access', array('type' => 'text', 'not null' => TRUE));
   return $ret;
 }

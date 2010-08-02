@@ -21,6 +21,14 @@ The code has also been moved around a bit for readability, consistency and simpl
   with a lot of dashboards (you never know), this would clutter up the interface.
 - Validation of dashboard unique name, and also on letters, numbers etc.
 - settings ui: redirect after login (false by default)
+- Weights on dashboards screen.
+- Permission of dashboard per role .
+- Take over admin path.
+- Redirect to the right dashboard at once (instead of checking on $did).
+- Theming of widgets by dash_component by default.
+- URL alias for dashboard.
+- Menu callback for plugins.
+- Comments configuration widget (still in experimental phase, more use cases later).
 
 Todo
 ----
@@ -28,13 +36,10 @@ Todo
 
 Roadmap / ideas
 ---------------
-- Permission of dashboard per role 
-- Take over admin path
+- Modules enabler / disabler methods - or maybe a complete plugin.
 - Revise plugin system - do we really want classes or not.
 - dashboards & custom widgets - exportables & features via ctools 
 - Convert widget methods so they only need to return output and be
-  themed by dash_component by default (title & description can be fetched by widget registry).
 - Frontend interface to enable/disable plugins, they are now handled
   by the is_enabled() method which defaults to TRUE in the most plugins.
-- Dashboard in a dashboard, or simply have a 'nicer' overview of all your 
-  dashboards with title, description and link ?
+- Collapse widgets like fieldsets  

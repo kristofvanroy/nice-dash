@@ -1,7 +1,9 @@
 Drupal.NiceDash = Drupal.NiceDash || {};
+
 $(document).ready(function(){
   Drupal.NiceDash();
 });
+
 Drupal.NiceDash = function(){
   initFilters();
   function initFilters(){

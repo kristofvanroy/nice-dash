@@ -88,26 +88,10 @@ function _nice_dash_get_custom_widgets() {
  */
 function _nice_dash_menu() {
 
-  $items['admin/dashboard'] = array(
-    'title' => 'Dashboard',
-    'page callback' => 'nice_dash_dashboard_page',
-    'access arguments' => array('view nice dashboard'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'nice_dash.pages.inc'
-  );
-
-  $items['admin/dashboard/view'] = array(
-    'title' => 'View',
-    'page callback' => 'nice_dash_dashboard_page',
-    'access arguments' => array('view nice dashboard'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -1,
-    'file' => 'nice_dash.pages.inc'
-  );
-
   $items['admin/dashboard/configure'] = array(
     'title' => 'Configure',
-    'page callback' => 'nice_dash_dashboard_overview_page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_dashboard_overview_page'),
     'access arguments' => array('administer nice dashboard'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'nice_dash.pages.inc'
@@ -117,7 +101,8 @@ function _nice_dash_menu() {
   $weight = 0;
   $items['admin/dashboard/configure/overview'] = array(
     'title' => 'Overview',
-    'page callback' => 'nice_dash_dashboard_overview_page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_dashboard_overview_page'),
     'access arguments' => array('administer nice dashboard'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => $weight++,
@@ -187,12 +172,10 @@ function _nice_dash_menu() {
 
   if (count($dashboards) > 0) {
 
-    $first = TRUE;
-
     foreach ($dashboards as $dashboard) {
-
       $items['admin/dashboard/configure/'. $dashboard->did .'/edit'] = array(
         'title' => 'Edit '. $dashboard->name,
+        'weight' => $dashboard->weight,
         'page callback' => 'drupal_get_form',
         'page arguments' => array('nice_dash_dashboard_settings_form', 3),
         'access arguments' => array('administer nice dashboard'),
@@ -200,27 +183,53 @@ function _nice_dash_menu() {
         'file' => 'nice_dash.pages.inc'
       );
 
-      if ($first) {
-        $type = MENU_DEFAULT_LOCAL_TASK;
-        $first = FALSE;
-      }
-      else {
-        $type = MENU_LOCAL_TASK;
-      }
-
       $items['admin/dashboard/view/'. $dashboard->did] = array(
         'title' => $dashboard->name,
         'page callback' => 'nice_dash_dashboard_page',
         'page arguments' => array(3),
-        'access arguments' => array('view nice dashboard'),
-        'type' => $type,
+        'access callback' => 'nice_dash_dashboard_access',
+        'access arguments' => array($dashboard),
+        'type' => MENU_LOCAL_TASK,
         'weight' => $dashboard->weight,
         'file' => 'nice_dash.pages.inc'
       );
     }
   }
 
+  $items['admin/dashboard'] = array(
+    'title' => 'Dashboard',
+    'page callback' => '_nice_dash_dashboard_page',
+    'access callback' => '_nice_dash_dashboard_access',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'nice_dash.pages.inc'
+  );
+
+  $items['admin/dashboard/view'] = array(
+    'title' => 'View',
+    'page callback' => '_nice_dash_dashboard_page',
+    'access callback' => '_nice_dash_dashboard_access',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+    'file' => 'nice_dash.pages.inc'
+  );
+
   return $items;
+}
+
+/**
+ * Alter menu items.
+ */
+function _nice_dash_menu_alter(&$items) {
+  if (variable_get('nice_dash_alter_admin_path', FALSE)) {
+    $items['admin'] = array(
+      'title' => 'Dashboard',
+      'page callback' => '_nice_dash_dashboard_page',
+      'access callback' => '_nice_dash_dashboard_access',
+      'type' => MENU_NORMAL_ITEM,
+      'file' => 'nice_dash.pages.inc',
+      'file path' => drupal_get_path('module', 'nice_dash'),
+    );
+  }
 }
 
 /**
@@ -245,6 +254,12 @@ function _nice_dash_theme() {
     'nice_dash_settings_form' => array(
       'arguments' => array('form' => NULL),
       'template' => 'nice-dash-dashboard-settings-form',
+      'file' => 'theme.inc',
+      'path' => $path .'/theme',
+    ),
+    'nice_dash_overview' => array(
+      'arguments' => array('form' => NULL),
+      'template' => 'nice-dash-dashboard-overview',
       'file' => 'theme.inc',
       'path' => $path .'/theme',
     ),
@@ -301,3 +316,4 @@ function _nice_dash_nice_dash_plugins() {
   );
   return $plugins;
 }
+

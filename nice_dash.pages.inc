@@ -6,6 +6,38 @@
  */
 
 /**
+ * Settings for Nice dash.
+ */
+function nice_dash_settings($form_state) {
+  $form = array();
+
+  $form['nice_dash_redirect_after_login'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Redirect after login'),
+    '#description' => t('Toggle this checkbox to redirect to the dashboard after login.'),
+    '#default_value' => variable_get('nice_dash_redirect_after_login', FALSE),
+  );
+
+  $form['nice_dash_alter_admin_path'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Take over admin path'),
+    '#description' => t('Toggle this checkbox to take over the admin path.'),
+    '#default_value' => variable_get('nice_dash_alter_admin_path', FALSE),
+  );
+
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'nice_dash_settings_submit';
+  return $form;
+}
+
+/**
+ * Submit function for settings form.
+ */
+function nice_dash_settings_submit($form, &$form_state) {
+  module_invoke('menu', 'rebuild');
+}
+
+/**
  * Menu callback for the dashboard page.
  */
 function nice_dash_dashboard_page($did = NULL) {
@@ -44,14 +76,15 @@ function nice_dash_dashboard_page($did = NULL) {
 
         if (!empty($widget)) {
           if (!isset($regions[$row->region])) $regions[$row->region] = '';
-          $regions[$row->region] .= $widget;
+          $widget_output = theme('nice_dash_component', $widget['title'], isset($widget['description']) ? $widget['description'] : '', $widget['content']);
+          $regions[$row->region] .= $widget_output;
         }
       }
     }
   }
 
   if (!count($regions)) {
-    drupal_set_message(t('You have not configured any widgets yet. Goto the <a href="@settings-page">dashboard settings</a> and configure some widgets first.', array('@settings-page' => url("admin/dashboard/settings"))), 'warning');
+    drupal_set_message(t('You have not configured any widgets yet. Goto the <a href="@settings-page">dashboard settings</a> and configure some widgets first.', array('@settings-page' => url('admin/dashboard/configure/' . $did . '/edit'))), 'warning');
     return '';
   }
 
@@ -64,54 +97,68 @@ function nice_dash_dashboard_page($did = NULL) {
  */
 function nice_dash_dashboard_overview_page() {
 
-  // Dashboards
+  $form = array();
+
+  $form['#tree'] = TRUE;
+  $form['#theme'] = 'nice_dash_overview';
+
   $dashboards = nice_dash_get_object();
   $output = '<h2>'. t('Dashboards') .'</h2>';
 
   if (count($dashboards) > 0) {
+
+    $form = array();
+    $form['#tree'] = TRUE;
+    $form['#theme'] = 'nice_dash_overview';
+
+    $dashboards = nice_dash_get_object();
+    $output = '<h2>'. t('Dashboards') .'</h2>';
+
     $headers = array(t('Name'), t('Actions'));
     $rows = array();
     foreach ($dashboards as $dashboard) {
-      $rows[] = array(
-        l($dashboard->name, 'admin/dashboard'),
-        l(t('View'), 'admin/dashboard/'. $dashboard->did) .' | '. l(t('Edit'), 'admin/dashboard/configure/'. $dashboard->did .'/edit') .' | '. l(t('Delete'), 'admin/dashboard/configure/'. $dashboard->did .'/delete'));
-
+      $form['#dashboards'][$dashboard->did] = $dashboard->weight;
+      $form[$dashboard->did]['title'] = array('#value' => $dashboard->name);
+      $form[$dashboard->did]['did'] = array('#value' => $dashboard->did);
+      $form[$dashboard->did]['weight'] = array(
+        '#type' => 'weight',
+        '#delta' => 10,
+        '#default_value' => $dashboard->weight,
+        '#attributes' => array(
+          'class' => 'overview-weight'
+        )
+      );
     }
-    $output .= theme('table', $headers, $rows);
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+    );
+
   }
   else {
     drupal_set_message(t('You have to create a dashboard first. You can create your first dashboard on the <a href="@create-page">dashboard create page</a>.', array('@create-page' => url("admin/dashboard/configure/create-dashboard"))), 'warning');
     $output .= '<p>'. t('No dashboards configured.') .'</p>';
   }
 
-  $regions['left'] = $output;
-
-  // Widgets
-  $output = '';
-
-  $widgets = nice_dash_get_object('widget_custom');
-  $output .= '<h2>'. t('Widgets') .'</h2>';
-
-  if (count($widgets) > 0) {
-    $headers = array(t('Title'), t('Actions'));
-    $rows = array();
-    foreach ($widgets as $widget) {
-      $rows[] = array(
-        $widget->title,
-        l(t('Edit'), 'admin/dashboard/widget/'. $widget->wid .'/edit') .' | '. l(t('Delete'), 'admin/dashboard/widget/'. $widget->wid .'/delete')
-      );
-    }
-    $output .= theme('table', $headers, $rows);
-  }
-  else {
-    $output .= '<p>'. t('No custom widgets configured.') .'</p>';
-  }
-
-  $regions['right'] = $output;
-
-  return theme('nice_dash_page', $regions);
+  return $form;
 }
 
+/**
+ * Submit for the dashboard overview form.
+ */
+function nice_dash_dashboard_overview_page_submit(&$form, &$form_state) {
+
+  foreach($form['#dashboards'] as $did => $weight) {
+    $object = new StdClass();
+    $object->weight = $form_state['values'][$did]['weight'];
+    $object->did = $form[$did]['did']['#value'];
+    drupal_write_record('nice_dash_dashboards', $object, 'did');
+  }
+  nice_dash_flush_caches();
+  menu_rebuild();
+  drupal_set_message(t('Your settings have been saved.'));
+}
 
 /**
  * Menu callback for the dashboard settings page.
@@ -147,6 +194,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
     }
 
     $form['widgets'] = array('#type' => 'value', '#value' => $form['#widgets']);
+
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Save'),
@@ -164,7 +212,30 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
     '#size' => 60,
     '#maxlength' => 128,
     '#required' => TRUE,
-    '#weight' => -100,
+  );
+
+  $url_alias = '';
+  if (isset($dashboard->did)) {
+    $internal_path = 'admin/dashboard/view/'. $dashboard->did;
+    $db_alias = drupal_get_path_alias($internal_path);
+    if ($internal_path != $db_alias) {
+      $url_alias = $db_alias;
+    }
+  }
+  $form['dashboard_alias'] = array(
+    '#type' => 'textfield',
+    '#default_value' => str_replace('dashboard/', '', $url_alias),
+    '#title' => t('URL alias'),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#description' => t('The prefix will be \'dashboard/\'. All characters will be set to lowercase and spaces will be rewritten to hyphens.')
+  );
+
+  $form['dashboard_access'] = array(
+    '#type' => 'checkboxes',
+    '#default_value' => $dashboard->access == '' ? '' : unserialize($dashboard->access),
+    '#title' => t('Dashboard access'),
+    '#options' => user_roles(TRUE)
   );
 
   // Current dashboard id.
@@ -239,9 +310,23 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
   $dashboard = new stdClass();
   $dashboard->name = $values['dashboard_name'];
 
+  // Access.
+  $dashboard->access = '';
+  foreach($values['dashboard_access'] as $value) {
+    if ($value != 0) {
+      $dashboard->access = serialize($values['dashboard_access']);
+      break;
+    }
+  }
+
+  // Update or not.
   if (isset($values['dashboard_id']) && !empty($values['dashboard_id'])) {
     $update_keys = array('did');
     $dashboard->did = $values['dashboard_id'];
+  }
+  else {
+    $weight = db_result(db_query("SELECT MAX(weight) FROM {nice_dash_dashboards}"));
+    $dashboard->weight = $weight + 1;
   }
 
   // Save dashboard.
@@ -270,6 +355,24 @@ function nice_dash_dashboard_settings_form_submit(&$form, &$form_state) {
       // Save widget.
       drupal_write_record('nice_dash_config', $widget, $update_keys);
     }
+  }
+
+  // Path alias.
+  if (!empty($values['dashboard_alias'])) {
+    $alias = $values['dashboard_alias'];
+    if (module_exists('pathauto')) {
+      _pathauto_include();
+      $alias = pathauto_cleanstring($alias);
+    }
+    else {
+      $alias = str_replace(' ', '-', $alias);
+      $alias = strtolower($alias);
+    }
+    $alias = 'dashboard/'. $alias;
+    path_set_alias('admin/dashboard/view/'. $dashboard->did, $alias);
+  }
+  else {
+    path_set_alias('admin/dashboard/view/'. $dashboard->did);
   }
 
   // Rebuild menu.
@@ -310,6 +413,7 @@ function nice_dash_dashboard_delete_form_submit($form, &$form_state) {
   $did = $form_state['values']['did'];
   db_query("DELETE FROM {nice_dash_dashboards} WHERE did = %d", $did);
   db_query("DELETE FROM {nice_dash_config} WHERE did = %d", $did);
+  db_query("DELETE FROM {url_alias} WHERE src = '%s'", 'admin/dashboard/view/'. $did);
 
   // Rebuild menu.
   nice_dash_flush_caches();
@@ -460,23 +564,6 @@ function nice_dash_widget_delete_form_submit($form, &$form_state) {
 }
 
 /**
- * Settings for Nice dash.
- */
-function nice_dash_settings($form_state) {
-  $form = array();
-
-  $form['nice_dash_redirect_after_login'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Redirect after login'),
-    '#description' => t('Toggle this checkbox to redirect to the dashboard after login.'),
-    '#default_value' => variable_get('nice_dash_redirect_after_login', FALSE),
-  );
-
-  $form = system_settings_form($form);
-  return $form;
-}
-
-/**
  * Function to return an array of layout regions available for widgets.
  */
 function nice_dash_regions() {
@@ -488,3 +575,4 @@ function nice_dash_regions() {
     'disabled' => t('Disabled')
   );
 }
+

@@ -56,6 +56,9 @@ class nice_dash_ga {
     // Create charts.
     $content .= chart_render(_google_analytics_reports_main_chart('page_views', t('Page Views'), $chart_pageviews, $chart_dates));
 
-    return theme('nice_dash_component', t('Visit statistics from Google Analytics'), '', $content);
+    return array(
+      'title' => t('Visit statistics from Google Analytics'),
+      'content' => $content,
+    );
   }
 }

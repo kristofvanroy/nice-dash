@@ -35,13 +35,21 @@ class nice_dash_user {
    * Latests registered users.
    */
   function nice_dash_user_widget_user_latest() {
-    return theme('nice_dash_component', t('Latest users'), t('An overview of the last registered users.'), views_embed_view('nice_dash_user', 'block_1'));
+    return array(
+      'title' => t('Latest users'),
+      'description' => t('An overview of the last registered users.'),
+      'content' => views_embed_view('nice_dash_user', 'block_1'),
+    );
   }
 
   /**
    * Latests logged in users.
    */
   function nice_dash_user_widget_user_last_login() {
-    return theme('nice_dash_component', t('Last loggedin users'), t('An overview of the users that have loggedin lately.'), views_embed_view('nice_dash_user', 'block_2'));
+    return array(
+      'title' => t('Last loggedin users'),
+      'description' => t('An overview of the users that have loggedin lately.'),
+      'content' => views_embed_view('nice_dash_user', 'block_2'),
+    );
   }
 }

@@ -39,28 +39,44 @@ class nice_dash_content {
   function nice_dash_content_widget_content_add() {
     $item = menu_get_item('node/add');
     $content = system_admin_menu_block($item);
-    $output = theme('node_add_list', $content);
-    return theme('nice_dash_component', t('Create content'), t('Select your content type'), $output);
+    $content = theme('node_add_list', $content);
+    return array(
+      'title' => t('Create content'),
+      'description' => t('Select your content type'),
+      'content' => $content,
+    );
   }
 
   /**
    * Latest content widget.
    */
   function nice_dash_content_widget_content_latest() {
-    return theme('nice_dash_component', t('Latest content'), t('An overview of the latest content'), views_embed_view('nice_dash_content', 'block_1'));
+    return array(
+      'title' => t('Latest content'),
+      'description' => t('An overview of the latest content'),
+      'content' => views_embed_view('nice_dash_content', 'block_1'),
+    );
   }
 
   /**
    * Sticky content widget.
    */
   function nice_dash_content_widget_content_sticky() {
-    return theme('nice_dash_component', t('Sticky items'), t('An overview of all content set as sticky'), views_embed_view('nice_dash_content', 'block_2'));
+    return array(
+      'title' =>t('Sticky items'),
+      'description' => t('An overview of all content set as sticky'),
+      'content' => views_embed_view('nice_dash_content', 'block_2'),
+    );
   }
 
   /**
    * Promoted content widget.
    */
   function nice_dash_content_widget_content_promoted() {
-    return theme('nice_dash_component', t('Promoted to frontpage'), t('An overview of all content promoted to frontpage'), views_embed_view('nice_dash_content', 'block_3'));
+    return array(
+      'title' => t('Promoted to frontpage'),
+      'description' => t('An overview of all content promoted to frontpage'),
+      'content' => views_embed_view('nice_dash_content', 'block_3'),
+    );
   }
 }

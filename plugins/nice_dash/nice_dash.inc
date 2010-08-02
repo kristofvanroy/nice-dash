@@ -36,7 +36,11 @@ class nice_dash {
           $block['subject'] = db_result(db_query("SELECT title FROM {blocks} WHERE module = 'block' AND delta = '%s'", $delta));
         }
       }
-      return theme('nice_dash_component', $widget->title, $widget->description, $block['content']);
+      return array(
+        'title' => $widget->title,
+        'description' => $widget->description,
+        'content' => $block['content'],
+      );
     }
   }
 }

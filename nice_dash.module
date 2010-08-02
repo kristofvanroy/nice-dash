@@ -21,6 +21,14 @@ function nice_dash_menu() {
 }
 
 /**
+ * Implementation of hook_menu().
+ */
+function nice_dash_menu_alter(&$items) {
+  module_load_include('inc', 'nice_dash', 'nice_dash.registry');
+  _nice_dash_menu_alter($items);
+}
+
+/**
  * Implementation of hook_theme().
  */
 function nice_dash_theme() {
@@ -61,7 +69,7 @@ function nice_dash_ctools_plugin_plugins() {
 function nice_dash_flush_caches() {
   // Delete objects & plugins cache.
   cache_clear_all('nice_dash_objects', 'cache');
-  cache_clear_all('plugins:sweaver:plugins', 'cache');
+  cache_clear_all('plugins:nice_dash:plugins', 'cache');
   return array();
 }
 
@@ -209,6 +217,8 @@ function nice_dash_get_object($type = 'dashboard', $id = NULL) {
       $objects['widget'] = _nice_dash_get_all_widgets();
       $objects['widget_custom'] = _nice_dash_get_custom_widgets();
       $objects['dashboard'] = _nice_dash_get_dashboards();
+      // Let other modules alter nice dash boards.
+      drupal_alter('nice_dashboard_objects', $objects);
       cache_set('nice_dash_objects', $objects);
     }
 
@@ -221,4 +231,128 @@ function nice_dash_get_object($type = 'dashboard', $id = NULL) {
   else {
     return isset($objects[$type]) ? $objects[$type] : array();
   }
+}
+
+/**
+ * check if user has access to the dashboard
+ */
+function nice_dash_dashboard_access($dashboard, $default_menu = FALSE) {
+
+  global $user;
+
+  if ($user->uid == 1 || (empty($dashboard->access) && user_access('view nice dashboard'))) {
+    if (isset($default_menu)) {
+      _nice_dash_set_default_menu_task($dashboard->did);
+    }
+    return TRUE;
+  }
+  foreach(unserialize($dashboard->access) as $key => $value) {
+    if ($value != 0 && array_key_exists($key, $user->roles)) {
+      if (isset($default_menu)) {
+        _nice_dash_set_default_menu_task($dashboard->did);
+      }
+      return TRUE;
+    }
+  }
+}
+
+/**
+ * helper function to check the access from the hook_menu
+ */
+function _nice_dash_dashboard_access() {
+  $result = nice_dash_get_object();
+  foreach($result as $key => $dashboard) {
+    if (nice_dash_dashboard_access($dashboard, TRUE) == TRUE) {
+      return TRUE;
+    }
+  }
+}
+
+/**
+ * set the dashboard did for the default local menu task
+ */
+function _nice_dash_set_default_menu_task($dashboard = NULL) {
+  static $did;
+  if (!isset($did) && isset($dashboard)) {
+    $did = $dashboard;
+  }
+  return $did;
+}
+
+/**
+ * helper function to redirect the default localtask to the correct dashboard
+ */
+function _nice_dash_dashboard_page() {
+  _nice_dash_dashboard_access();
+  $did = _nice_dash_set_default_menu_task();
+  $url = !empty($did) ? 'admin/dashboard/view/' . $did : 'admin/dashboard/configure/create-dashboard';
+  return drupal_goto($url);
+}
+
+/**
+ * Nice dash menu callback.
+ *
+ * @param array $settings
+ *   A collection of page arguments from the menu callback.
+ * @return string $output
+ *   The rendered page - can be form or anything else.
+ */
+function nice_dash_menu_callback($settings) {
+  $plugin_name = $settings['plugin'];
+  $callback_method = (isset($settings['callback_method'])) ? $settings['callback_method']: 'menu_callback';
+  $return_method = (isset($settings['return_method'])) ? $settings['return_method'] : 'drupal_get_form';
+
+  $object = nice_dash_get_plugin($plugin_name);
+  if ($object->nice_dash_enabled($plugin_name)) {
+    $output = $object->$callback_method();
+    if (!empty($output)) {
+      if ($return_method == 'drupal_get_form') {
+        return drupal_get_form('nice_dash_menu_callback_form', $output, $plugin_name, $callback_method);
+      }
+      elseif (!empty($return_method) && function_exists($return_method)) {
+        return $return_method($output);
+      }
+      else {
+        return $output;
+      }
+    }
+  }
+
+  return t('No page found or you do not have sufficient permission to access the page.');
+}
+
+/**
+ * Helper function to return the form passed by nice_dash_menu_callback or from a plugin.
+ *
+ * @param string $plugin_name
+ *   Name of the plugin.
+ * @param string $callback_method
+ *   Name of the method to call.
+ * @return string $form
+ *   The rendered form.
+ */
+function nice_dash_menu_callback_form($form_state, $form, $plugin_name, $callback_method) {
+  $form['#plugin_name'] = $plugin_name;
+  $form['#callback_method'] = $callback_method;
+  return $form;
+}
+
+/**
+ * Nice dash menu callback validate.
+ */
+function nice_dash_menu_callback_form_validate($form, &$form_state) {
+  $object = nice_dash_get_plugin($form['#plugin_name']);
+  $callback_validate_function = $form['#callback_method'] .'_validate';
+  if (method_exists($object, $callback_validate_function)) {
+    $object->$callback_validate_function($form, $form_state);
+  }
+}
+
+/**
+ * Nice dash menu callback form submit.
+ */
+function nice_dash_menu_callback_form_submit($form, &$form_state) {
+  $object = nice_dash_get_plugin($form['#plugin_name']);
+  $callback_submit_function = $form['#callback_method'] .'_submit';
+  $object->$callback_submit_function($form, $form_state);
 }
