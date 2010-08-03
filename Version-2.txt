@@ -39,7 +39,6 @@ Roadmap / ideas
 - Modules enabler / disabler methods - or maybe a complete plugin.
 - Revise plugin system - do we really want classes or not.
 - dashboards & custom widgets - exportables & features via ctools 
-- Convert widget methods so they only need to return output and be
 - Frontend interface to enable/disable plugins, they are now handled
   by the is_enabled() method which defaults to TRUE in the most plugins.
 - Collapse widgets like fieldsets  
