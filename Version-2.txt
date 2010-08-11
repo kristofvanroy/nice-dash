@@ -28,6 +28,8 @@ The code has also been moved around a bit for readability, consistency and simpl
 - Theming of widgets by dash_component by default.
 - URL alias for dashboard.
 - Menu callback for plugins.
+- Enable / Disable plugins.
+- cTools component minimizer.
 - Comments configuration widget (still in experimental phase, more use cases later).
 
 Todo
@@ -37,8 +39,5 @@ Todo
 Roadmap / ideas
 ---------------
 - Modules enabler / disabler methods - or maybe a complete plugin.
-- Revise plugin system - do we really want classes or not.
 - dashboards & custom widgets - exportables & features via ctools 
-- Frontend interface to enable/disable plugins, they are now handled
-  by the is_enabled() method which defaults to TRUE in the most plugins.
 - Collapse widgets like fieldsets  

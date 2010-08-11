@@ -564,6 +564,48 @@ function nice_dash_widget_delete_form_submit($form, &$form_state) {
 }
 
 /**
+ * Plugin settings form.
+ */
+function nice_dash_plugins_settings_form(&$form, &$form_state) {
+
+  $plugins = nice_dash_get_all_plugins();
+
+  $form = array();
+  $options = array();
+  $default_value = array();
+
+  foreach ($plugins as $key => $value) {
+    $options[$key] = $key;
+    if ($value['visible'] == 1) {
+      $default_value[$key] = $key;
+    }
+  }
+
+  $form['plugins'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Enable / disable plugins'),
+    '#default_value' => $default_value,
+    '#options' => $options,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save changes')
+  );
+
+  return $form;
+
+}
+
+/**
+ * Plugin submit form.
+ */
+function nice_dash_plugins_settings_form_submit(&$form, &$form_state) {
+  variable_set('nice_dash_visibility', serialize($form_state['values']['plugins']));
+  cache_clear_all('nice_dash', 'cache', TRUE);
+}
+
+/**
  * Function to return an array of layout regions available for widgets.
  */
 function nice_dash_regions() {

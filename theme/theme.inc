@@ -6,7 +6,7 @@
  */
 
 /**
- * Theme callback for the dashboard page.
+ * Preprocess function for a dashboard page.
  */
 function template_preprocess_nice_dash_page(&$vars) {
 
@@ -20,19 +20,28 @@ function template_preprocess_nice_dash_page(&$vars) {
 
   // Add markup.
   drupal_add_js(drupal_get_path('module', 'nice_dash') .'/js/dashboard.js');
-  drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css');
+  drupal_add_js(drupal_get_path('module', 'ctools') .'/js/collapsible-div.js');
+  drupal_add_css(drupal_get_path('module', 'nice_dash') .'/css/nice_dash.css', 'theme');
 }
 
+/**
+ * Preprocess function for a dashboard component.
+ */
+function template_preprocess_nice_dash_component(&$vars) {
+  $vars['ctools_id'] = $vars['id'] .'_'. strtolower(str_replace(' ', '_', $vars['title']));
+}
 
 /**
- * Preprocess function from the dashboard setting form.
- *
- * Here the regions are added.
+ * Preprocess function for the dashboard setting form.
  */
 function template_preprocess_nice_dash_settings_form(&$vars) {
   $form = &$vars['form'];
 
-  $vars['above_widget_settings'] = drupal_render($form['dashboard_name']);
+  $above_widget_settings = drupal_render($form['dashboard_name']);
+  $above_widget_settings .= drupal_render($form['dashboard_access']);
+  $above_widget_settings .= drupal_render($form['dashboard_alias']);
+
+  $vars['above_widget_settings'] = $above_widget_settings;
   $vars['below_widget_settings'] = '';
 
   // Order the widgets
@@ -81,4 +90,27 @@ function template_preprocess_nice_dash_settings_form(&$vars) {
   $vars['rows'] = $rows;
   $vars['submit'] = drupal_render($form);
   $vars['regions'] = $regions;
+}
+
+/**
+ * Preprocess function for the dashboard overview form.
+ */
+function template_preprocess_nice_dash_overview(&$vars) {
+  $form = &$vars['form'];
+  $rows = array();
+
+  asort($form['#dashboards']);
+  foreach ($form['#dashboards'] as $did => $weight) {
+    $row = new stdClass;
+    $row->title = drupal_render($form[$did]['title']);
+    $row->weight = drupal_render($form[$did]['weight']);
+    $row->did = drupal_render($form[$did]['did']);
+    $rows[] = $row;
+  }
+
+  drupal_add_js('misc/tableheader.js');
+  drupal_add_tabledrag('fields', 'order', 'sibling', 'overview-weight', NULL, NULL, TRUE);
+
+  $vars['rows'] = $rows;
+  $vars['submit'] = drupal_render($form);
 }

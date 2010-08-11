@@ -163,7 +163,7 @@ function nice_dash_dashboard_block() {
 }
 
 /**
- * Get all plugins or a plugin handler.
+ * Get all visible plugins or a plugin handler.
  *
  * @param string $plugin_name
  *   The name of the plugin.
@@ -177,9 +177,14 @@ function nice_dash_get_plugin($plugin_name = NULL) {
   if (empty($cached_plugins)) {
     ctools_include('plugins');
     $plugins = ctools_get_plugins('nice_dash', 'plugins');
+    $plugin_visibilty = unserialize(variable_get('nice_dash_visibility', ''));
+    foreach ($plugins as $key => $value) {
+      if ($plugin_visibilty[$key] == '0') {
+        unset($plugins[$key]);
+      }
+    }
     $cached_plugins = $plugins;
   }
-
   if ($plugin_name == NULL) {
     return $cached_plugins;
   }
@@ -191,6 +196,19 @@ function nice_dash_get_plugin($plugin_name = NULL) {
     }
     return isset($cache[$plugin_name]) ? $cache[$plugin_name] : FALSE;
   }
+}
+
+/**
+ * Get all plugins or a plugin handler.
+ */
+function nice_dash_get_all_plugins() {
+  ctools_include('plugins');
+  $plugins = ctools_get_plugins('nice_dash', 'plugins');
+  $plugin_visibilty = unserialize(variable_get('nice_dash_visibility', ''));
+  foreach ($plugins as $key => $value) {
+    $plugin_visibilty[$key] == '0' ? $plugins[$key]['visible'] = 0 : $plugins[$key]['visible'] = 1;
+  }
+  return $plugins;
 }
 
 /**
@@ -246,7 +264,7 @@ function nice_dash_dashboard_access($dashboard, $default_menu = FALSE) {
     }
     return TRUE;
   }
-  foreach(unserialize($dashboard->access) as $key => $value) {
+  foreach (unserialize($dashboard->access) as $key => $value) {
     if ($value != 0 && array_key_exists($key, $user->roles)) {
       if (isset($default_menu)) {
         _nice_dash_set_default_menu_task($dashboard->did);
@@ -261,7 +279,7 @@ function nice_dash_dashboard_access($dashboard, $default_menu = FALSE) {
  */
 function _nice_dash_dashboard_access() {
   $result = nice_dash_get_object();
-  foreach($result as $key => $dashboard) {
+  foreach ($result as $key => $dashboard) {
     if (nice_dash_dashboard_access($dashboard, TRUE) == TRUE) {
       return TRUE;
     }
