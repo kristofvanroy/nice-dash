@@ -59,6 +59,13 @@ function _nice_dash_get_all_widgets() {
     $widgets[$row->wid] = $row;
   }
 
+  $plugin_visibilty = unserialize(variable_get('nice_dash_visibility', ''));
+  foreach($widgets as $key => $value) {
+    if ($plugin_visibilty[$value->widget_plugin] == '0') {
+      unset($widgets[$key]);
+    }
+  }
+
   return $widgets;
 }
 
@@ -88,6 +95,23 @@ function _nice_dash_get_custom_widgets() {
  */
 function _nice_dash_menu() {
 
+  $items['admin/dashboard'] = array(
+    'title' => 'Dashboard',
+    'page callback' => '_nice_dash_dashboard_page',
+    'access callback' => '_nice_dash_dashboard_access',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'nice_dash.pages.inc'
+  );
+
+  $items['admin/dashboard/view'] = array(
+    'title' => 'View',
+    'page callback' => '_nice_dash_dashboard_page',
+    'access callback' => '_nice_dash_dashboard_access',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+    'file' => 'nice_dash.pages.inc'
+  );
+
   $items['admin/dashboard/configure'] = array(
     'title' => 'Configure',
     'page callback' => 'drupal_get_form',
@@ -96,7 +120,6 @@ function _nice_dash_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'nice_dash.pages.inc'
   );
-
 
   $weight = 0;
   $items['admin/dashboard/configure/overview'] = array(
@@ -149,6 +172,17 @@ function _nice_dash_menu() {
     'file' => 'nice_dash.pages.inc'
   );
 
+  // Plugins.
+  $items['admin/dashboard/configure/plugins'] = array(
+    'title' => 'Plugins',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_plugins_settings_form'),
+    'access arguments' => array('administer nice dashboard'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => $weight++,
+    'file' => 'nice_dash.pages.inc'
+  );
+
   $items['admin/dashboard/widget/%/delete'] = array(
     'title' => 'Delete widget',
     'page callback' => 'drupal_get_form',
@@ -195,23 +229,13 @@ function _nice_dash_menu() {
       );
     }
   }
-
-  $items['admin/dashboard'] = array(
-    'title' => 'Dashboard',
-    'page callback' => '_nice_dash_dashboard_page',
-    'access callback' => '_nice_dash_dashboard_access',
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'nice_dash.pages.inc'
-  );
-
-  $items['admin/dashboard/view'] = array(
-    'title' => 'View',
-    'page callback' => '_nice_dash_dashboard_page',
-    'access callback' => '_nice_dash_dashboard_access',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -1,
-    'file' => 'nice_dash.pages.inc'
-  );
+  else {
+    $items['admin/dashboard/configure']['type'] = MENU_DEFAULT_LOCAL_TASK;
+    $items['admin/dashboard/view']['type'] = MENU_LOCAL_TASK;
+    $items['admin/dashboard'] = $items['admin/dashboard/configure'];
+    $items['admin/dashboard']['type'] = MENU_NORMAL_ITEM;
+    $items['admin/dashboard']['title'] = 'Dashboard';
+  }
 
   return $items;
 }
