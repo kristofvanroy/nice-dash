@@ -30,6 +30,7 @@ The code has also been moved around a bit for readability, consistency and simpl
 - Menu callback for plugins.
 - Enable / Disable plugins.
 - cTools component minimizer.
+- Switch configure to view if there is no dashboard.
 - Comments configuration widget (still in experimental phase, more use cases later).
 
 Todo
@@ -40,4 +41,3 @@ Roadmap / ideas
 ---------------
 - Modules enabler / disabler methods - or maybe a complete plugin.
 - dashboards & custom widgets - exportables & features via ctools 
-- Collapse widgets like fieldsets  
