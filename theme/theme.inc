@@ -101,14 +101,14 @@ function template_preprocess_nice_dash_overview(&$vars) {
   $rows = array();
   
   if ($form['#dashboards']) {
-  	asort($form['#dashboards']);
-  	foreach ($form['#dashboards'] as $did => $weight) {
-    	$row = new stdClass;
-    	$row->title = drupal_render($form[$did]['title']);
-    	$row->weight = drupal_render($form[$did]['weight']);
-    	$row->did = drupal_render($form[$did]['did']);
-    	$rows[] = $row;
-  	}
+    asort($form['#dashboards']);
+    foreach ($form['#dashboards'] as $did => $weight) {
+      $row = new stdClass;
+      $row->title = drupal_render($form[$did]['title']);
+      $row->weight = drupal_render($form[$did]['weight']);
+      $row->did = drupal_render($form[$did]['did']);
+      $rows[] = $row;
+    }
   }
 
   drupal_add_js('misc/tableheader.js');
