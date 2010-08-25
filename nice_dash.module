@@ -152,7 +152,7 @@ function nice_dash_dashboard_block() {
   }
 
   if (user_access('administer nice dashboard')) {
-    $links['create']['href'] = 'admin/dashboard/create-dashboard';
+    $links['create']['href'] = 'admin/dashboard/configure/create-dashboard';
     $links['create']['title'] = t('Create new dashboard');
 
     $links['configure']['href'] = 'admin/dashboard/configure';
