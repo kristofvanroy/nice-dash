@@ -96,16 +96,19 @@ function template_preprocess_nice_dash_settings_form(&$vars) {
  * Preprocess function for the dashboard overview form.
  */
 function template_preprocess_nice_dash_overview(&$vars) {
+  
   $form = &$vars['form'];
   $rows = array();
-
-  asort($form['#dashboards']);
-  foreach ($form['#dashboards'] as $did => $weight) {
-    $row = new stdClass;
-    $row->title = drupal_render($form[$did]['title']);
-    $row->weight = drupal_render($form[$did]['weight']);
-    $row->did = drupal_render($form[$did]['did']);
-    $rows[] = $row;
+  
+  if ($form['#dashboards']) {
+  	asort($form['#dashboards']);
+  	foreach ($form['#dashboards'] as $did => $weight) {
+    	$row = new stdClass;
+    	$row->title = drupal_render($form[$did]['title']);
+    	$row->weight = drupal_render($form[$did]['weight']);
+    	$row->did = drupal_render($form[$did]['did']);
+    	$rows[] = $row;
+  	}
   }
 
   drupal_add_js('misc/tableheader.js');
