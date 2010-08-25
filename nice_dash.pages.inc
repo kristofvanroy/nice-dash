@@ -236,7 +236,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
 
   $form['dashboard_access'] = array(
     '#type' => 'checkboxes',
-    '#default_value' => $dashboard->access == '' ? '' : unserialize($dashboard->access),
+    '#default_value' => $dashboard->access == '' ? array() : unserialize($dashboard->access),
     '#title' => t('Dashboard access'),
     '#options' => user_roles(TRUE)
   );
