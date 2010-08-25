@@ -16,6 +16,7 @@ function nice_dash_settings($form_state) {
     '#title' => t('Redirect after login'),
     '#description' => t('Toggle this checkbox to redirect to the dashboard after login.'),
     '#default_value' => variable_get('nice_dash_redirect_after_login', FALSE),
+    '#weight' => -2
   );
 
   $form['nice_dash_alter_admin_path'] = array(
@@ -23,6 +24,7 @@ function nice_dash_settings($form_state) {
     '#title' => t('Take over admin path'),
     '#description' => t('Toggle this checkbox to take over the admin path.'),
     '#default_value' => variable_get('nice_dash_alter_admin_path', FALSE),
+    '#weight' => -1,
   );
 
   $form = system_settings_form($form);
