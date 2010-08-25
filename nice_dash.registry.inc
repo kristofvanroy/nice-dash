@@ -151,6 +151,15 @@ function _nice_dash_menu() {
     'weight' => $weight++,
     'file' => 'nice_dash.pages.inc'
   );
+  
+  $items['admin/dashboard/configure/%/edit'] = array(
+    'title' => 'Create new dashboard',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nice_dash_widget_settings_form', 3),
+    'access arguments' => array('administer nice dashboard'),
+    'type' => MENU_CALLBACK,
+    'file' => 'nice_dash.pages.inc'
+  );
 
   $items['admin/dashboard/configure/%/delete'] = array(
     'title' => 'Create new dashboard',

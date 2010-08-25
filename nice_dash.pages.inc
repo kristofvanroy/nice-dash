@@ -192,6 +192,7 @@ function nice_dash_dashboard_settings_form(&$form_state, $did = NULL) {
           'class' => 'field-region-select field-region-disabled ',
         ),
       );
+     
       $form[$widget->wid]['weight'] = array('#type' => 'weight', '#delta' => 1, '#default_value' => $default_values['weight']);
     }
 
