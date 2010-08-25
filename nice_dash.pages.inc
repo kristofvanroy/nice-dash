@@ -569,7 +569,7 @@ function nice_dash_widget_delete_form_submit($form, &$form_state) {
 /**
  * Plugin settings form.
  */
-function nice_dash_plugins_settings_form(&$form, &$form_state) {
+function nice_dash_plugins_settings_form(&$form_state) {
 
   $plugins = nice_dash_get_all_plugins();
 
