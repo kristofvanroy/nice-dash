@@ -1,16 +1,36 @@
-Drupal.NiceDash = Drupal.NiceDash || {};
-$(document).ready(function(){
-  Drupal.NiceDash();
-});
-Drupal.NiceDash = function(){
-  initFilters();
-  function initFilters(){
-    $('.view-filters').parent().before('<div class="filter-container"><a href="" class="toggle-link">Toggle filter</a></div><br class="clear" />');
-    $('.view-filters').toggle();
-    $('.toggle-link').bind('click', toggleFilters);
-  }
-  function toggleFilters(e){
-    $(e.target).parent().parent().find('.view-filters').slideToggle();
-    e.preventDefault();
-  }
-}
+(function($) {
+
+// Define settings
+Drupal.settings.NiceDash = Drupal.settings.NiceDash || {toggleText: Drupal.t('Toggle filter')};
+
+// Define main behavior
+Drupal.behaviors.NiceDash = function(context) {
+  $('.view-filters:not(.nicedash-processed)', context)
+  .addClass('nicedash-processed')
+  .each(function(i, el) {
+    Drupal.behaviors.NiceDash.init(this);
+  });
+};
+
+// Initialisation
+Drupal.behaviors.NiceDash.init = function(elem) {
+  var $filters = $(elem),
+      $link = $('<a href="#" class="toggle-link">' + Drupal.settings.NiceDash.toggleText + '</a>')
+      .bind('click', Drupal.behaviors.NiceDash.toggleFilters)
+      .wrap('<div class="filter-container"></div>')
+      .parent();
+  $filters
+  .before($link)
+  .toggle();
+};
+
+// Click handler
+Drupal.behaviors.NiceDash.toggleFilters = function() {
+  $(this)
+  .parent()
+  .siblings('.view-filters')
+  .slideToggle();
+  return false;
+};
+
+})(jQuery);
